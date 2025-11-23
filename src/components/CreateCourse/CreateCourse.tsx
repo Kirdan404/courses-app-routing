@@ -28,9 +28,9 @@ type Course = {
 };
 
 type CreateCourseProps = {
-  authors: Author[];
-  onAddAuthor: (author: Author) => void;
-  onAddCourse: (course: Course) => void;
+  authors?: Author[];
+  onAddAuthor?: (author: Author) => void;
+  onAddCourse?: (course: Course) => void;
   onCancel?: () => void;
 };
 
@@ -52,8 +52,14 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year}`;
 };
 
-export default function CreateCourse({ authors: authorsProp, onAddAuthor, onAddCourse, onCancel }: CreateCourseProps) {
-  const initialAuthors: Author[] = (authorsProp.length ? authorsProp : mockedAuthorsList).map((a) => ({
+export default function CreateCourse({
+  authors: authorsProp = mockedAuthorsList,
+  onAddAuthor,
+  onAddCourse,
+  onCancel,
+}: CreateCourseProps = {}) {
+  const sourceAuthors: Author[] = Array.isArray(authorsProp) ? authorsProp : [];
+  const initialAuthors: Author[] = sourceAuthors.map((a) => ({
     id: a.id,
     name: a.name,
   }));
@@ -70,7 +76,7 @@ export default function CreateCourse({ authors: authorsProp, onAddAuthor, onAddC
   ];
 
   useEffect(() => {
-    if (authorsProp.length) {
+    if (Array.isArray(authorsProp)) {
       setAuthors(authorsProp);
     }
   }, [authorsProp]);
@@ -127,7 +133,7 @@ export default function CreateCourse({ authors: authorsProp, onAddAuthor, onAddC
 
     const newAuthor = { id: createId(), name: trimmed };
     setAuthors((prev) => [...prev, newAuthor]);
-    onAddAuthor(newAuthor);
+    onAddAuthor?.(newAuthor);
     setNewAuthorName("");
     setAuthorError(undefined);
   };
@@ -178,7 +184,7 @@ export default function CreateCourse({ authors: authorsProp, onAddAuthor, onAddC
       authors: courseAuthors.map((author) => author.id),
     };
 
-    onAddCourse(newCourse);
+    onAddCourse?.(newCourse);
 
     // reset form and move authors back for next creation
     setForm(initialFormState);

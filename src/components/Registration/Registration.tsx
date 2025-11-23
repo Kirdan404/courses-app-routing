@@ -93,14 +93,16 @@ export default function Registraion() {
           </div>
 
           <Button
-            buttonText="REGISTRATION"
+            buttonText="REGISTER"
             className="btn-primary btn-registration-login"
             type="submit"
             onClick={() => {}}
+            ariaLabel="Register"
+            name="register"
           />
 
           <p className="registration-info">
-            If you have an account you may <b>Login</b>
+            If you have an account you may <b>Login</b> or <b>Register</b>
           </p>
         </form>
       </div>
