@@ -22,9 +22,10 @@ type CoursesProps = {
     courses: Course[];
     authors: Author[];
     onShowCourse: (courseId: string) => void;
+    onAddCourseClick?: () => void;
 };
 
-const Courses = ({ courses, authors, onShowCourse }: CoursesProps) => {
+const Courses = ({ courses, authors, onShowCourse, onAddCourseClick }: CoursesProps) => {
     const [searchQuery, setSearchQuery] = useState("");
 
     const authorsDictionary = useMemo(() => {
@@ -62,7 +63,7 @@ const Courses = ({ courses, authors, onShowCourse }: CoursesProps) => {
                     <Button
                         className="courses__add-button"
                         buttonText="Add new course"
-                        onClick={() => {}}
+                        onClick={onAddCourseClick || (() => {})}
                     />
                 </div>
 

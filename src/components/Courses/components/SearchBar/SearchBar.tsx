@@ -1,4 +1,5 @@
 import { ChangeEvent, KeyboardEvent, useState } from "react";
+import "./SearchBar.css";
 import Button from "../../../../common/Button/Button";
 import "./SearchBar.css";
 
