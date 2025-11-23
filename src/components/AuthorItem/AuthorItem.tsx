@@ -6,7 +6,7 @@ type AuthorItemProps = {
   onAdd?: () => void;
   onDelete?: () => void;
   buttonText?: string;
-  onButtonClick?: () => void;
+  onButtonClick?: (id?: string) => void;
   id?: string;
 };
 
@@ -28,6 +28,7 @@ export default function AuthorItem({
     : "add";
   const text = buttonText || (variant === "add" ? "Add author" : "Delete author");
   const handler = onButtonClick || onAdd || onDelete;
+  const identifier = id ?? displayName;
 
   return (
     <div className="author-item">
@@ -38,7 +39,7 @@ export default function AuthorItem({
             className={`author-item__button author-item__button--${variant}`}
             buttonText={text}
             ariaLabel={text}
-            onClick={() => handler(id)}
+            onClick={() => handler(identifier)}
           />
         )}
       </div>

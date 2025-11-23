@@ -155,11 +155,11 @@ export default function CreateCourse({
     const trimmedDuration = form.duration.trim();
 
     if (!trimmedDuration) {
-      nextErrors.duration = "Duration is required.";
+      nextErrors.duration = "Duration is required and should be greater than 0.";
     } else if (!/^\d+$/.test(trimmedDuration)) {
       nextErrors.duration = "Duration must be a number.";
     } else if (Number(trimmedDuration) <= 0) {
-      nextErrors.duration = "Duration should be more than 0 minutes.";
+      nextErrors.duration = "Duration is required and should be greater than 0.";
     }
 
     setErrors(nextErrors);
@@ -321,7 +321,9 @@ export default function CreateCourse({
               setCourseAuthors([]);
               setNewAuthorName("");
               setAuthorError(undefined);
-              onCancel?.();
+              if (onCancel) {
+                onCancel();
+              }
             }}
           />
           <Button
