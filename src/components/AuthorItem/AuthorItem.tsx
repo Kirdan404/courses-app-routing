@@ -28,7 +28,7 @@ export default function AuthorItem({
     : "add";
   const text = buttonText || (variant === "add" ? "Add author" : "Delete author");
   const handler = onButtonClick || onAdd || onDelete;
-  const identifier = id ?? displayName;
+  const identifier = id ?? "1";
 
   return (
     <div className="author-item">

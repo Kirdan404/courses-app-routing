@@ -56,7 +56,7 @@ export default function CreateCourse({
   authors: authorsProp = mockedAuthorsList,
   onAddAuthor,
   onAddCourse,
-  onCancel,
+  onCancel = () => {},
 }: CreateCourseProps = {}) {
   const sourceAuthors: Author[] = Array.isArray(authorsProp) ? authorsProp : [];
   const initialAuthors: Author[] = sourceAuthors.map((a) => ({
@@ -321,9 +321,7 @@ export default function CreateCourse({
               setCourseAuthors([]);
               setNewAuthorName("");
               setAuthorError(undefined);
-              if (onCancel) {
-                onCancel();
-              }
+              onCancel();
             }}
           />
           <Button
