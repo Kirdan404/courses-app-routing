@@ -102,7 +102,7 @@ export default function Registraion() {
           />
 
           <p className="registration-info">
-            If you have an account you may <b>Login</b> or <b>Register</b>
+            If you have an account you may <b>Login</b> or <b>Registration</b>
           </p>
         </form>
       </div>

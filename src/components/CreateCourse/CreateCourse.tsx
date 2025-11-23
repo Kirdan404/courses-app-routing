@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
-import AuthorItem from "./AuthorItem/AuthorItem";
+import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CreateCourse.css";
 import { mockedAuthorsList } from "../../constants";
 import getCourseDuration from "../../helpers/getCourseDuration";
@@ -122,7 +122,7 @@ export default function CreateCourse({
     }
 
     if (trimmed.length < 2) {
-      setAuthorError("Author name must be at least 2 characters.");
+      setAuthorError("Author name should be at least 2 characters.");
       return;
     }
 
@@ -144,16 +144,12 @@ export default function CreateCourse({
     const trimmedTitle = form.title.trim();
     const trimmedDescription = form.description.trim();
 
-    if (!trimmedTitle) {
-      nextErrors.title = "Title is required.";
-    } else if (trimmedTitle.length < 2) {
-      nextErrors.title = "Title must be at least 2 characters.";
+    if (!trimmedTitle || trimmedTitle.length < 2) {
+      nextErrors.title = "Title is required and should be at least 2 characters.";
     }
 
-    if (!form.description.trim()) {
-      nextErrors.description = "Description is required.";
-    } else if (trimmedDescription.length < 2) {
-      nextErrors.description = "Description must be at least 2 characters.";
+    if (!form.description.trim() || trimmedDescription.length < 2) {
+      nextErrors.description = "Description is required and should be at least 2 characters.";
     }
 
     const trimmedDuration = form.duration.trim();
@@ -319,7 +315,14 @@ export default function CreateCourse({
             className="btn-primary"
             buttonText="CANCEL"
             type="button"
-            onClick={onCancel || (() => {})}
+            onClick={() => {
+              setForm(initialFormState);
+              setErrors({});
+              setCourseAuthors([]);
+              setNewAuthorName("");
+              setAuthorError(undefined);
+              onCancel?.();
+            }}
           />
           <Button
             className="btn-primary"

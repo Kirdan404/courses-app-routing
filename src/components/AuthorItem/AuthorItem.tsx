@@ -2,30 +2,43 @@ import Button from "../../common/Button/Button";
 import "./AuthorItem.css";
 
 type AuthorItemProps = {
-  name: string;
+  name?: string;
   onAdd?: () => void;
   onDelete?: () => void;
+  buttonText?: string;
+  onButtonClick?: () => void;
+  id?: string;
 };
 
-export default function AuthorItem({ name, onAdd, onDelete }: AuthorItemProps) {
+export default function AuthorItem({
+  name,
+  onAdd,
+  onDelete,
+  buttonText,
+  onButtonClick,
+  id,
+}: AuthorItemProps) {
+  const displayName = name || "John Doe";
+  const variant = onDelete
+    ? "delete"
+    : onAdd
+    ? "add"
+    : buttonText?.toLowerCase().includes("delete")
+    ? "delete"
+    : "add";
+  const text = buttonText || (variant === "add" ? "Add author" : "Delete author");
+  const handler = onButtonClick || onAdd || onDelete;
+
   return (
     <div className="author-item">
-      <span className="author-item__name">{name}</span>
+      <span className="author-item__name">{displayName}</span>
       <div className="author-item__buttons">
-        {onAdd && (
+        {handler && (
           <Button
-            className="author-item__button author-item__button--add"
-            buttonText=""
-            ariaLabel="add"
-            onClick={onAdd}
-          />
-        )}
-        {onDelete && (
-          <Button
-            className="author-item__button author-item__button--delete"
-            buttonText=""
-            ariaLabel="delete"
-            onClick={onDelete}
+            className={`author-item__button author-item__button--${variant}`}
+            buttonText={text}
+            ariaLabel={text}
+            onClick={() => handler(id)}
           />
         )}
       </div>
