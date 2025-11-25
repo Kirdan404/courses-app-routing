@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
@@ -10,13 +11,19 @@ type RegistrationFormState = {
   password: string;
 };
 
-export default function Registraion() {
+type RegistrationProps = {
+  onRegisterSuccess?: (name: string) => void;
+};
+
+export default function Registraion({ onRegisterSuccess }: RegistrationProps) {
+  const navigate = useNavigate();
   const [form, setForm] = useState<RegistrationFormState>({
     name: "",
     email: "",
     password: "",
   });
   const [errors, setErrors] = useState<Partial<RegistrationFormState>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const handleChange =
     (field: keyof RegistrationFormState) =>
@@ -25,7 +32,7 @@ export default function Registraion() {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const nextErrors: Partial<RegistrationFormState> = {};
 
@@ -43,8 +50,37 @@ export default function Registraion() {
     setErrors(nextErrors);
 
     const hasErrors = Object.values(nextErrors).some(Boolean);
-    if (!hasErrors) {
-      // submit logic placeholder
+    if (hasErrors) return;
+
+    try {
+      const response = await fetch("http://localhost:4000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          password: form.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setApiError(result?.result || "Registration failed");
+        return;
+      }
+
+      if (result?.user?.name) {
+        localStorage.setItem("userName", result.user.name);
+        onRegisterSuccess?.(result.user.name);
+      } else {
+        localStorage.removeItem("userName");
+        onRegisterSuccess?.("");
+      }
+
+      navigate("/login");
+    } catch (err) {
+      setApiError("Network error. Please try again.");
     }
   };
 
@@ -96,13 +132,14 @@ export default function Registraion() {
             buttonText="REGISTER"
             className="btn-primary btn-registration-login"
             type="submit"
-            onClick={() => {}}
             ariaLabel="Register"
-            name="register"
+            onClick={() => {}}
           />
+          {apiError && <span className="validation-error">{apiError}</span>}
 
           <p className="registration-info">
-            If you have an account you may <b>Login</b> or <b>Registration</b>
+            If you have an account you may <b><Link to="/login">Login</Link></b> or{" "}
+            <b>Registration</b>
           </p>
         </form>
       </div>

@@ -2,6 +2,7 @@ import Button from "../../common/Button/Button";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
 import "./CourseInfo.css";
+import { Link } from "react-router-dom";
 
 type CourseInfoProps = {
   id: string;
@@ -57,7 +58,9 @@ export default function CourseInfo({
       </div>
 
       <div className="course-info__actions">
-        <Button className="course-info__back" buttonText="BACK" onClick={onBack} />
+        <Link to="/courses">
+          <Button className="course-info__back" buttonText="BACK" onClick={onBack} />
+        </Link>
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
@@ -10,6 +11,10 @@ type LoginFormState = {
   password: string;
 };
 
+type LoginProps = {
+  onLoginSuccess?: (name: string) => void;
+};
+
 const initialState: LoginFormState = {
   email: "",
   password: "",
@@ -17,9 +22,11 @@ const initialState: LoginFormState = {
 
 const isEmailValid = (value: string) => /\S+@\S+\.\S+/.test(value);
 
-export default function Login() {
+export default function Login({ onLoginSuccess }: LoginProps) {
+  const navigate = useNavigate();
   const [form, setForm] = useState<LoginFormState>(initialState);
   const [errors, setErrors] = useState<Partial<LoginFormState>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const handleChange =
     (field: keyof LoginFormState) =>
@@ -28,7 +35,7 @@ export default function Login() {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const nextErrors: Partial<LoginFormState> = {};
 
@@ -45,8 +52,37 @@ export default function Login() {
     setErrors(nextErrors);
 
     const hasErrors = Object.values(nextErrors).some(Boolean);
-    if (!hasErrors) {
-      // submit logic placeholder
+    if (hasErrors) return;
+
+    try {
+      const response = await fetch("http://localhost:4000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setApiError(result?.result || "Login failed");
+        return;
+      }
+
+      // if backend returns user info, you can adjust accordingly
+      if (result?.user?.name) {
+        localStorage.setItem("userName", result.user.name);
+        onLoginSuccess?.(result.user.name);
+      } else {
+        localStorage.removeItem("userName");
+        onLoginSuccess?.("");
+      }
+      localStorage.setItem("token", result.result);
+      navigate("/courses");
+    } catch (err) {
+      setApiError("Network error. Please try again.");
     }
   };
 
@@ -88,9 +124,13 @@ export default function Login() {
             type="submit"
             onClick={() => {}}
           />
+          {apiError && <span className="validation-error">{apiError}</span>}
 
           <p className="login-info">
-            If you don&apos;t have an account you may <b>Registration</b>
+            If you don&apos;t have an account you may{" "}
+            <b>
+              <Link to="/registration">Registration</Link>
+            </b>
           </p>
         </form>
       </div>
