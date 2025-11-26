@@ -71,10 +71,10 @@ export default function Registraion({ onRegisterSuccess }: RegistrationProps) {
       }
 
       if (result?.user?.name) {
-        localStorage.setItem("userName", result.user.name);
+        localStorage.setItem("user", result.user.name);
         onRegisterSuccess?.(result.user.name);
       } else {
-        localStorage.removeItem("userName");
+        localStorage.removeItem("user");
         onRegisterSuccess?.("");
       }
 

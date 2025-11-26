@@ -25,7 +25,7 @@ export default function CourseInfo({
 }: CourseInfoProps) {
   const formattedDate = formatCreationDate(creationDate);
   const formattedDuration = getCourseDuration(duration);
-  const authorsList = authors.join(", ");
+  const authorsList = (authors || []).join(", ");
 
   return (
     <section className="course-info">

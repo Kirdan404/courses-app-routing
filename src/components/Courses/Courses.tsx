@@ -25,13 +25,18 @@ type CoursesProps = {
     onAddCourseClick?: () => void;
 };
 
-const Courses = ({ courses, authors, onShowCourse, onAddCourseClick }: CoursesProps) => {
+const Courses = ({
+    courses = [],
+    authors = [],
+    onShowCourse,
+    onAddCourseClick,
+}: CoursesProps) => {
     const [searchQuery, setSearchQuery] = useState("");
 
     const authorsDictionary = useMemo(() => {
         const dictionary: Record<string, string> = {};
 
-        authors.forEach((author) => {
+        (authors || []).forEach((author) => {
             dictionary[author.id] = author.name;
         });
 

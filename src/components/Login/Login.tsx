@@ -73,10 +73,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
       // if backend returns user info, you can adjust accordingly
       if (result?.user?.name) {
-        localStorage.setItem("userName", result.user.name);
+        localStorage.setItem("user", result.user.name);
         onLoginSuccess?.(result.user.name);
       } else {
-        localStorage.removeItem("userName");
+        localStorage.removeItem("user");
         onLoginSuccess?.("");
       }
       localStorage.setItem("token", result.result);

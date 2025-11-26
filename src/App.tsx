@@ -15,9 +15,7 @@ import { logout, mockedAuthorsList, mockedCoursesList } from "./constants";
 const AppContent = () => {
   const [authors, setAuthors] = useState(mockedAuthorsList);
   const [courses, setCourses] = useState(mockedCoursesList);
-  const [userName, setUserName] = useState<string>(
-    localStorage.getItem("userName") || ""
-  );
+  const [userName, setUserName] = useState<string>(localStorage.getItem("user") || "");
   const navigate = useNavigate();
 
   const authorsDictionary = useMemo(() => {
@@ -49,7 +47,7 @@ const AppContent = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("userName");
+    localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUserName("");
   };
