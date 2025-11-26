@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
@@ -68,11 +69,13 @@ const Courses = ({
             <div className="courses__content">
                 <div className="courses__toolbar">
                     <SearchBar onSearch={setSearchQuery} />
-                    <Button
-                        className="courses__add-button"
-                        buttonText="Add new course"
-                        onClick={onAddCourseClick || (() => {})}
-                    />
+                    <Link to="/courses/add">
+                        <Button
+                            className="courses__add-button"
+                            buttonText="Create course"
+                            onClick={onAddCourseClick || (() => {})}
+                        />
+                    </Link>
                 </div>
 
                 <div className="courses__list">

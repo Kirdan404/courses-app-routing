@@ -29,7 +29,8 @@ export default function CourseInfo({
   authors,
   onBack,
 }: CourseInfoProps) {
-  const courseFromMocks = mockedCoursesList.find((course) => course.id === id);
+  const courseFromMocks =
+    mockedCoursesList.find((course) => course.id === id) || mockedCoursesList[0];
 
   const resolvedTitle = title || courseFromMocks?.title || "";
   const resolvedDescription = description || courseFromMocks?.description || "";
