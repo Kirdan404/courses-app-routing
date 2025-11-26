@@ -5,20 +5,24 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 
 type HeaderProps = {
-  buttonText: string;
-  userName: string;
-  onLogout: () => void;
+  buttonText?: string;
+  userName?: string;
+  onLogout?: () => void;
 };
 
-const Header = ({ buttonText, userName, onLogout }: HeaderProps) => {
+const Header = ({ buttonText = "Logout", userName = "", onLogout = () => {} }: HeaderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isAuth = useMemo(() => Boolean(localStorage.getItem("token")), []);
+  const displayUserName = userName || localStorage.getItem("user") || "";
+  const displayButtonText = buttonText || "Logout";
   const hideUserBlock =
     location.pathname === "/login" || location.pathname === "/registration";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userName");
     onLogout();
     navigate("/login");
   };
@@ -31,8 +35,8 @@ const Header = ({ buttonText, userName, onLogout }: HeaderProps) => {
         </Link>
         {!hideUserBlock && isAuth && (
           <div className="header__actions">
-            {userName && <span className="header__user">{userName}</span>}
-            <Button className="header__button" buttonText={buttonText} onClick={handleLogout} />
+            {displayUserName && <span className="header__user">{displayUserName}</span>}
+            <Button className="header__button" buttonText={displayButtonText} onClick={handleLogout} />
           </div>
         )}
       </div>

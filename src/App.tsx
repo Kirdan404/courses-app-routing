@@ -9,7 +9,7 @@ import CourseInfo from "./components/CourseInfo/CourseInfo";
 import CreateCourse from "./components/CreateCourse/CreateCourse";
 import Login from "./components/Login/Login";
 import Registration from "./components/Registration/Registration";
-import PrivateRoute from "./components/PrivateRoute";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import { logout, mockedAuthorsList, mockedCoursesList } from "./constants";
 
 const AppContent = () => {

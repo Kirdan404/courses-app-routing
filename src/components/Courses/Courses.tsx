@@ -3,6 +3,7 @@ import Button from "../../common/Button/Button";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
+import { mockedAuthorsList, mockedCoursesList } from "../../constants";
 
 type Author = {
     id: string;
@@ -19,29 +20,31 @@ type Course = {
 };
 
 type CoursesProps = {
-    courses: Course[];
-    authors: Author[];
-    onShowCourse: (courseId: string) => void;
+    courses?: Course[];
+    authors?: Author[];
+    onShowCourse?: (courseId: string) => void;
     onAddCourseClick?: () => void;
 };
 
 const Courses = ({
-    courses = [],
-    authors = [],
-    onShowCourse,
+    courses = mockedCoursesList,
+    authors = mockedAuthorsList,
+    onShowCourse = () => {},
     onAddCourseClick,
 }: CoursesProps) => {
     const [searchQuery, setSearchQuery] = useState("");
+    const effectiveCourses = (courses && courses.length ? courses : mockedCoursesList) || [];
+    const effectiveAuthors = (authors && authors.length ? authors : mockedAuthorsList) || [];
 
     const authorsDictionary = useMemo(() => {
         const dictionary: Record<string, string> = {};
 
-        (authors || []).forEach((author) => {
+        (effectiveAuthors || []).forEach((author) => {
             dictionary[author.id] = author.name;
         });
 
         return dictionary;
-    }, [authors]);
+    }, [effectiveAuthors]);
 
     const resolveAuthorNames = (authorIds: string[]) =>
         authorIds
@@ -51,14 +54,14 @@ const Courses = ({
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
     const filteredCourses = useMemo(() => {
-        if (!normalizedQuery) return courses;
+        if (!normalizedQuery) return effectiveCourses;
 
-        return courses.filter((course) => {
+        return effectiveCourses.filter((course) => {
             const titleMatch = course.title.toLowerCase().includes(normalizedQuery);
             const idMatch = course.id.toLowerCase().includes(normalizedQuery);
             return titleMatch || idMatch;
         });
-    }, [courses, normalizedQuery]);
+    }, [effectiveCourses, normalizedQuery]);
 
     return (
         <section className="courses">

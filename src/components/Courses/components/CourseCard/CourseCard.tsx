@@ -1,6 +1,7 @@
 import Button from "../../../../common/Button/Button";
 import getCourseDuration from "../../../../helpers/getCourseDuration";
 import formatCreationDate from "../../../../helpers/formatCreationDate";
+import { Link } from "react-router-dom";
 import "./CourseCard.css";
 
 type CourseCardProps = {
@@ -21,7 +22,7 @@ type CourseCardProps = {
   onShow: () => void;
 };
 
-export default function CourseCard({ title, description, duration, creationDate, authors, onShow }: CourseCardProps) {
+export default function CourseCard({ course, title, description, duration, creationDate, authors, onShow }: CourseCardProps) {
   return (
     <article className="course-card">
       <div className="course-card__body">
@@ -44,7 +45,9 @@ export default function CourseCard({ title, description, duration, creationDate,
             {authors.join(", ")}
           </span>
         </div>
-        <Button className="course-card__button" buttonText="Show course" onClick={onShow} />
+        <Link to={`/courses/${course.id}`}>
+          <Button className="course-card__button" buttonText="Show course" onClick={onShow} />
+        </Link>
       </div>
     </article>
   );
