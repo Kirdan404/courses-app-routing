@@ -16,11 +16,9 @@ const Header = ({ buttonText = "Logout", onLogout = () => {} }: HeaderProps) => 
   const user = useAppSelector((state) => state.user);
   const location = useLocation();
   const navigate = useNavigate();
-  const isAuth = useMemo(() => Boolean(localStorage.getItem("token")), []);
+  const isAuth = useMemo(() => Boolean(localStorage.getItem("token") || user.isAuth || user.token), [user.isAuth, user.token]);
   const displayUserName = user.name || localStorage.getItem("user") || "";
   const displayButtonText = buttonText || "Logout";
-  const hideUserBlock =
-    location.pathname === "/login" || location.pathname === "/registration";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -37,7 +35,7 @@ const Header = ({ buttonText = "Logout", onLogout = () => {} }: HeaderProps) => 
         <Link to={isAuth ? "/courses" : "/login"}>
           <Logo />
         </Link>
-        {!hideUserBlock && isAuth && (
+        {isAuth && (
           <div className="header__actions">
             {displayUserName && <span className="header__user">{displayUserName}</span>}
             <Button className="header__button" buttonText={displayButtonText} onClick={handleLogout} />

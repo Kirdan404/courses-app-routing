@@ -1,8 +1,11 @@
+import { useMemo } from "react";
 import Button from "../../common/Button/Button";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
 import "./CourseInfo.css";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useAppSelector } from "../../store/hooks";
+import { selectAuthors, selectCourses } from "../../store/selectors";
 
 type CourseInfoProps = {
   id: string;
@@ -23,16 +26,39 @@ export default function CourseInfo({
   authors,
   onBack,
 }: CourseInfoProps) {
-  const resolvedTitle = title || "";
-  const resolvedDescription = description || "";
-  const resolvedDuration = duration ?? 0;
-  const resolvedCreationDate = creationDate || "";
+  const params = useParams();
+  const courses = useAppSelector(selectCourses);
+  const authorsListFromStore = useAppSelector(selectAuthors);
 
-  const rawAuthors = authors || [];
-  const authorsList = rawAuthors.join(", ");
+  const courseId = id || params.courseId || "";
+  const courseFromStore = useMemo(
+    () => courses.find((course) => course.id === courseId),
+    [courses, courseId]
+  );
+
+  const authorsDictionary = useMemo(() => {
+    const dict: Record<string, string> = {};
+    authorsListFromStore.forEach((a) => {
+      dict[a.id] = a.name;
+    });
+    return dict;
+  }, [authorsListFromStore]);
+
+  const resolvedTitle = title || courseFromStore?.title || "";
+  const resolvedDescription = description || courseFromStore?.description || "";
+  const resolvedDuration = duration ?? courseFromStore?.duration ?? 0;
+  const resolvedCreationDate = creationDate || courseFromStore?.creationDate || "";
+
+  const rawAuthors = authors && authors.length ? authors : courseFromStore?.authors || [];
+  const resolvedAuthors =
+    typeof rawAuthors[0] === "string"
+      ? (rawAuthors as string[]).map((authorIdOrName) => authorsDictionary[authorIdOrName] || authorIdOrName)
+      : [];
+
+  const authorsList = resolvedAuthors.join(", ");
   const formattedDate = formatCreationDate(resolvedCreationDate);
   const formattedDuration = getCourseDuration(resolvedDuration);
-  const displayId = id || "";
+  const displayId = courseId || courseFromStore?.id || "";
   const handleBack = onBack || (() => {});
 
   return (

@@ -44,4 +44,5 @@ const coursesSlice = createSlice({
 });
 
 export const { setCourses, addCourse, updateCourse, removeCourse } = coursesSlice.actions;
+export const deleteCourse = removeCourse;
 export default coursesSlice.reducer;

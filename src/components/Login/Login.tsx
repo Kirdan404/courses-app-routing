@@ -75,14 +75,17 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       }
 
       // if backend returns user info, you can adjust accordingly
-      if (result?.user?.name) {
-        localStorage.setItem("user", result.user.name);
+      const userName = result?.user?.name || "";
+      const token = result.result || "";
+
+      if (userName) {
+        localStorage.setItem("user", userName);
       } else {
         localStorage.removeItem("user");
       }
-      localStorage.setItem("token", result.result);
-      dispatch(setUser({ name: result?.user?.name || "", email: form.email.trim(), token: result.result }));
-      onLoginSuccess?.(result?.user?.name || "");
+      localStorage.setItem("token", token);
+      dispatch(setUser({ name: userName, email: form.email.trim(), token }));
+      onLoginSuccess?.(userName);
       navigate("/courses");
     } catch (err) {
       setApiError("Network error. Please try again.");
