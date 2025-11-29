@@ -8,12 +8,29 @@ type UserState = {
 };
 
 const storedToken = localStorage.getItem("token") || "";
-const storedName = localStorage.getItem("user") || "";
+const storedUserRaw = localStorage.getItem("user") || "";
+
+const parsedStoredUser = (() => {
+  if (!storedUserRaw) return { name: "", email: "" };
+  try {
+    const parsed = JSON.parse(storedUserRaw);
+    if (parsed && typeof parsed === "object") {
+      return {
+        name: (parsed as { name?: string }).name || "",
+        email: (parsed as { email?: string }).email || "",
+      };
+    }
+  } catch (err) {
+    // fallback to treating raw string as name
+    return { name: storedUserRaw, email: "" };
+  }
+  return { name: "", email: "" };
+})();
 
 const initialState: UserState = {
   isAuth: Boolean(storedToken),
-  name: storedName,
-  email: "",
+  name: parsedStoredUser.name,
+  email: parsedStoredUser.email,
   token: storedToken,
 };
 

@@ -70,9 +70,9 @@ export default function Registraion({ onRegisterSuccess }: RegistrationProps) {
         return;
       }
 
-      if (result?.user?.name) {
-        localStorage.setItem("user", result.user.name);
-        onRegisterSuccess?.(result.user.name);
+      if (result?.user?.name || result?.user?.email) {
+        localStorage.setItem("user", JSON.stringify({ name: result.user.name || "", email: result.user.email || "" }));
+        onRegisterSuccess?.(result.user.name || "");
       } else {
         localStorage.removeItem("user");
         onRegisterSuccess?.("");

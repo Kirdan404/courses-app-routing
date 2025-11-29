@@ -17,7 +17,21 @@ const Header = ({ buttonText = "Logout", onLogout = () => {} }: HeaderProps) => 
   const location = useLocation();
   const navigate = useNavigate();
   const isAuth = useMemo(() => Boolean(localStorage.getItem("token") || user.isAuth || user.token), [user.isAuth, user.token]);
-  const displayUserName = user.name || localStorage.getItem("user") || "";
+  const storedUserRaw = localStorage.getItem("user");
+  let storedUserName = "";
+  if (storedUserRaw) {
+    try {
+      const parsed = JSON.parse(storedUserRaw);
+      if (parsed && typeof parsed === "object") {
+        storedUserName = (parsed as { name?: string }).name || "";
+      } else {
+        storedUserName = storedUserRaw;
+      }
+    } catch (err) {
+      storedUserName = storedUserRaw;
+    }
+  }
+  const displayUserName = user.name || storedUserName;
   const displayButtonText = buttonText || "Logout";
 
   const handleLogout = () => {

@@ -77,14 +77,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       // if backend returns user info, you can adjust accordingly
       const userName = result?.user?.name || "";
       const token = result.result || "";
+      const userEmail = form.email.trim();
 
-      if (userName) {
-        localStorage.setItem("user", userName);
+      if (userName || userEmail) {
+        localStorage.setItem("user", JSON.stringify({ name: userName, email: userEmail }));
       } else {
         localStorage.removeItem("user");
       }
       localStorage.setItem("token", token);
-      dispatch(setUser({ name: userName, email: form.email.trim(), token }));
+      dispatch(setUser({ name: userName, email: userEmail, token }));
       onLoginSuccess?.(userName);
       navigate("/courses");
     } catch (err) {
