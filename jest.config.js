@@ -7,6 +7,7 @@ export default {
     "./src",
     "./test",
   ],
+  moduleNameMapper: {'^@/(.*)$': '<rootDir>/src/$1',},
   testEnvironment: "jsdom",
   moduleFileExtensions: [
     "js",
@@ -21,12 +22,13 @@ export default {
   transform: {
     "\\.[jt]sx?$": "babel-jest",
     "^.+\\.css$": "jest-transform-css",
-    "^.+\\.svg$": "jest-transform-stub",
+    "^.+\\.(svg|png|jpe?g|gif|webp|avif)$": "jest-transform-stub",
   },
 
   transformIgnorePatterns: [
     "node_modules/(?!(hex-rgb))"
   ],
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
 
   // Indicates which provider should be used to instrument code for coverage
   coverageProvider: "v8",
