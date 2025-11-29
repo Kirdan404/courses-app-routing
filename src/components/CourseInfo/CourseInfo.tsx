@@ -1,7 +1,6 @@
 import Button from "../../common/Button/Button";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
-import { mockedAuthorsList, mockedCoursesList } from "../../constants";
 import "./CourseInfo.css";
 import { Link } from "react-router-dom";
 
@@ -15,11 +14,6 @@ type CourseInfoProps = {
   onBack?: () => void;
 };
 
-const authorNameById: Record<string, string> = {};
-mockedAuthorsList.forEach((author) => {
-  authorNameById[author.id] = author.name;
-});
-
 export default function CourseInfo({
   id,
   title,
@@ -29,21 +23,16 @@ export default function CourseInfo({
   authors,
   onBack,
 }: CourseInfoProps) {
-  const courseFromMocks =
-    mockedCoursesList.find((course) => course.id === id) || mockedCoursesList[0];
+  const resolvedTitle = title || "";
+  const resolvedDescription = description || "";
+  const resolvedDuration = duration ?? 0;
+  const resolvedCreationDate = creationDate || "";
 
-  const resolvedTitle = title || courseFromMocks?.title || "";
-  const resolvedDescription = description || courseFromMocks?.description || "";
-  const resolvedDuration = duration ?? courseFromMocks?.duration ?? 0;
-  const resolvedCreationDate = creationDate || courseFromMocks?.creationDate || "";
-
-  const rawAuthors = (authors && authors.length ? authors : courseFromMocks?.authors) || [];
-  const resolvedAuthors = rawAuthors.map((author) => authorNameById[author] || author);
-
+  const rawAuthors = authors || [];
+  const authorsList = rawAuthors.join(", ");
   const formattedDate = formatCreationDate(resolvedCreationDate);
   const formattedDuration = getCourseDuration(resolvedDuration);
-  const authorsList = resolvedAuthors.join(", ");
-  const displayId = id || courseFromMocks?.id || "";
+  const displayId = id || "";
   const handleBack = onBack || (() => {});
 
   return (

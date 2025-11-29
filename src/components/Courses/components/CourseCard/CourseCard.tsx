@@ -3,6 +3,8 @@ import getCourseDuration from "../../../../helpers/getCourseDuration";
 import formatCreationDate from "../../../../helpers/formatCreationDate";
 import { Link } from "react-router-dom";
 import "./CourseCard.css";
+import { useAppDispatch } from "../../../../store/hooks";
+import { removeCourse } from "../../../../store/courses/coursesSlice";
 
 type CourseCardProps = {
   course: {
@@ -23,6 +25,12 @@ type CourseCardProps = {
 };
 
 export default function CourseCard({ course, title, description, duration, creationDate, authors, onShow }: CourseCardProps) {
+  const dispatch = useAppDispatch();
+
+  const handleDelete = () => {
+    dispatch(removeCourse(course.id));
+  };
+
   return (
     <article className="course-card">
       <div className="course-card__body">
@@ -32,6 +40,12 @@ export default function CourseCard({ course, title, description, duration, creat
 
       <div className="course-card__sidebar">
         <div className="course-card__meta">
+          <span className="course-card__meta-label">Authors:</span>
+          <span className="course-card__meta-value course-card__authors">
+            {authors.join(", ")}
+          </span>
+        </div>
+        <div className="course-card__meta">
           <span className="course-card__meta-label">Duration:</span>
           <span className="course-card__meta-value">{getCourseDuration(duration)}</span>
         </div>
@@ -39,15 +53,23 @@ export default function CourseCard({ course, title, description, duration, creat
           <span className="course-card__meta-label">Created:</span>
           <span className="course-card__meta-value">{formatCreationDate(creationDate)}</span>
         </div>
-        <div className="course-card__meta">
-          <span className="course-card__meta-label">Authors:</span>
-          <span className="course-card__meta-value course-card__authors">
-            {authors.join(", ")}
-          </span>
+
+        <div className="course-card__buttons">
+          <Link to={`/courses/${course.id}`}>
+            <Button 
+              className="course-card__button-show" 
+              buttonText="Show course" 
+              onClick={onShow} />
+          </Link>
+          <Button 
+            className="course-card__button-delete" 
+            buttonText="" 
+            onClick={handleDelete} />
+          <Button 
+          className="course-card__button-edit" 
+          buttonText="" 
+          onClick={() => {}} />
         </div>
-        <Link to={`/courses/${course.id}`}>
-          <Button className="course-card__button" buttonText="Show course" onClick={onShow} />
-        </Link>
       </div>
     </article>
   );

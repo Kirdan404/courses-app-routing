@@ -43,10 +43,10 @@
 }
 
 .course-card__sidebar {
-    width: 240px;
+    width: 310px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 5px
 }
 
 .course-card__meta {
@@ -75,7 +75,33 @@
     text-overflow: ellipsis;
 }
 
-.course-card__button {
-    align-self: flex-start;
-    min-width: 160px;
+.course-card__buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 30px;
 }
+
+.course-card__button-show {
+    width: 180px;
+    padding: 0;
+}
+
+.course-card__button-delete,
+.course-card__button-edit {
+    min-width: 50px;
+    width: 61px;
+    padding: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 24px 24px;
+}
+
+.course-card__button-delete {
+    background-image: url("../../../../assets/images/delete.png");
+}
+
+.course-card__button-edit {
+    background-image: url("../../../../assets/images/edit.png");
+}
+

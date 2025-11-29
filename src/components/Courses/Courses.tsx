@@ -1,51 +1,43 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
-import { mockedAuthorsList, mockedCoursesList } from "../../constants";
-
-type Author = {
-    id: string;
-    name: string;
-};
-
-type Course = {
-    id: string;
-    title: string;
-    description: string;
-    duration: number | string;
-    creationDate: string;
-    authors: string[];
-};
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchAuthors } from "../../store/authors/authorsSlice";
+import { fetchCourses } from "../../store/courses/coursesSlice";
+import { selectAuthors, selectCourses } from "../../store/selectors";
 
 type CoursesProps = {
-    courses?: Course[];
-    authors?: Author[];
     onShowCourse?: (courseId: string) => void;
     onAddCourseClick?: () => void;
 };
 
-const Courses = ({
-    courses = mockedCoursesList,
-    authors = mockedAuthorsList,
-    onShowCourse = () => {},
-    onAddCourseClick,
-}: CoursesProps) => {
+const Courses = ({ onShowCourse = () => {}, onAddCourseClick }: CoursesProps) => {
+    const dispatch = useAppDispatch();
+    const courses = useAppSelector(selectCourses);
+    const authors = useAppSelector(selectAuthors);
     const [searchQuery, setSearchQuery] = useState("");
-    const effectiveCourses = (courses && courses.length ? courses : mockedCoursesList) || [];
-    const effectiveAuthors = (authors && authors.length ? authors : mockedAuthorsList) || [];
+
+    useEffect(() => {
+        if (!courses.length) {
+            dispatch(fetchCourses());
+        }
+        if (!authors.length) {
+            dispatch(fetchAuthors());
+        }
+    }, [dispatch, courses.length, authors.length]);
 
     const authorsDictionary = useMemo(() => {
         const dictionary: Record<string, string> = {};
 
-        (effectiveAuthors || []).forEach((author) => {
+        authors.forEach((author) => {
             dictionary[author.id] = author.name;
         });
 
         return dictionary;
-    }, [effectiveAuthors]);
+    }, [authors]);
 
     const resolveAuthorNames = (authorIds: string[]) =>
         authorIds
@@ -55,14 +47,14 @@ const Courses = ({
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
     const filteredCourses = useMemo(() => {
-        if (!normalizedQuery) return effectiveCourses;
+        if (!normalizedQuery) return courses;
 
-        return effectiveCourses.filter((course) => {
+        return courses.filter((course) => {
             const titleMatch = course.title.toLowerCase().includes(normalizedQuery);
             const idMatch = course.id.toLowerCase().includes(normalizedQuery);
             return titleMatch || idMatch;
         });
-    }, [effectiveCourses, normalizedQuery]);
+    }, [courses, normalizedQuery]);
 
     return (
         <section className="courses">

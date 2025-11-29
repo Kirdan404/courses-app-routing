@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
+import { useAppDispatch } from "../../store/hooks";
+import { setUser } from "../../store/user/userSlice";
 
 import "./Login.css";
 
@@ -23,6 +25,7 @@ const initialState: LoginFormState = {
 const isEmailValid = (value: string) => /\S+@\S+\.\S+/.test(value);
 
 export default function Login({ onLoginSuccess }: LoginProps) {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [form, setForm] = useState<LoginFormState>(initialState);
   const [errors, setErrors] = useState<Partial<LoginFormState>>({});
@@ -74,12 +77,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       // if backend returns user info, you can adjust accordingly
       if (result?.user?.name) {
         localStorage.setItem("user", result.user.name);
-        onLoginSuccess?.(result.user.name);
       } else {
         localStorage.removeItem("user");
-        onLoginSuccess?.("");
       }
       localStorage.setItem("token", result.result);
+      dispatch(setUser({ name: result?.user?.name || "", email: form.email.trim(), token: result.result }));
+      onLoginSuccess?.(result?.user?.name || "");
       navigate("/courses");
     } catch (err) {
       setApiError("Network error. Please try again.");

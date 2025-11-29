@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import "./App.css";
@@ -10,12 +10,18 @@ import CreateCourse from "./components/CreateCourse/CreateCourse";
 import Login from "./components/Login/Login";
 import Registration from "./components/Registration/Registration";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
-import { logout, mockedAuthorsList, mockedCoursesList } from "./constants";
+import { logout } from "./constants";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { fetchAuthors, addAuthor as addAuthorAction } from "./store/authors/authorsSlice";
+import { addCourse as addCourseAction, fetchCourses } from "./store/courses/coursesSlice";
+import { logout as logoutUser, setUser } from "./store/user/userSlice";
+import { selectAuthors, selectCourses, selectUser } from "./store/selectors";
 
 const AppContent = () => {
-  const [authors, setAuthors] = useState(mockedAuthorsList);
-  const [courses, setCourses] = useState(mockedCoursesList);
-  const [userName, setUserName] = useState<string>(localStorage.getItem("user") || "");
+  const dispatch = useAppDispatch();
+  const authors = useAppSelector(selectAuthors);
+  const courses = useAppSelector(selectCourses);
+  const user = useAppSelector(selectUser);
   const navigate = useNavigate();
 
   const authorsDictionary = useMemo(() => {
@@ -32,7 +38,7 @@ const AppContent = () => {
       .filter((name): name is string => Boolean(name));
 
   const handleAddAuthor = (author: { id: string; name: string }) => {
-    setAuthors((prev) => [...prev, author]);
+    dispatch(addAuthorAction(author));
   };
 
   const handleAddCourse = (course: {
@@ -43,23 +49,32 @@ const AppContent = () => {
     duration: number;
     authors: string[];
   }) => {
-    setCourses((prev) => [...prev, course]);
+    dispatch(addCourseAction(course));
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    setUserName("");
+    dispatch(logoutUser());
   };
+
+  useEffect(() => {
+    if (user.token) {
+      if (!authors.length) dispatch(fetchAuthors());
+      if (!courses.length) dispatch(fetchCourses());
+    }
+  }, [user.token, dispatch, authors.length, courses.length]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/courses", { replace: true });
+    }
+  }, [navigate]);
 
   const CoursesPage = () =>
     courses.length > 0 ? (
-      <Courses
-        courses={courses}
-        authors={authors}
-        onShowCourse={(courseId) => navigate(`/courses/${courseId}`)}
-        onAddCourseClick={() => navigate("/courses/add")}
-      />
+      <Courses onShowCourse={(courseId) => navigate(`/courses/${courseId}`)} onAddCourseClick={() => navigate("/courses/add")} />
     ) : (
       <EmptyCourseList />
     );
@@ -99,11 +114,20 @@ const AppContent = () => {
 
   return (
     <>
-      <Header buttonText={logout} onLogout={handleLogout} userName={userName} />
+      <Header buttonText={logout} onLogout={handleLogout} />
       <main>
         <Routes>
-          <Route path="/login" element={<Login onLoginSuccess={setUserName} />} />
-          <Route path="/registration" element={<Registration onRegisterSuccess={setUserName} />} />
+          <Route
+            path="/login"
+            element={
+              <Login
+                onLoginSuccess={(name) =>
+                  dispatch(setUser({ name, email: "", token: localStorage.getItem("token") || "" }))
+                }
+              />
+            }
+          />
+          <Route path="/registration" element={<Registration onRegisterSuccess={() => {}} />} />
           <Route
             path="/courses"
             element={

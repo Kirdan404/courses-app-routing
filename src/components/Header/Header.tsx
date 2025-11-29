@@ -3,18 +3,21 @@ import Logo from "./components/Logo/Logo";
 import "./Header.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { logout as logoutAction } from "../../store/user/userSlice";
 
 type HeaderProps = {
   buttonText?: string;
-  userName?: string;
   onLogout?: () => void;
 };
 
-const Header = ({ buttonText = "Logout", userName = "", onLogout = () => {} }: HeaderProps) => {
+const Header = ({ buttonText = "Logout", onLogout = () => {} }: HeaderProps) => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
   const location = useLocation();
   const navigate = useNavigate();
   const isAuth = useMemo(() => Boolean(localStorage.getItem("token")), []);
-  const displayUserName = userName || localStorage.getItem("user") || "";
+  const displayUserName = user.name || localStorage.getItem("user") || "";
   const displayButtonText = buttonText || "Logout";
   const hideUserBlock =
     location.pathname === "/login" || location.pathname === "/registration";
@@ -23,6 +26,7 @@ const Header = ({ buttonText = "Logout", userName = "", onLogout = () => {} }: H
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("userName");
+    dispatch(logoutAction());
     onLogout();
     navigate("/login");
   };

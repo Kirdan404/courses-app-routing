@@ -4,8 +4,10 @@ import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CreateCourse.css";
-import { mockedAuthorsList } from "../../constants";
 import getCourseDuration from "../../helpers/getCourseDuration";
+import { useAppDispatch } from "../../store/hooks";
+import { addAuthor as addAuthorAction } from "../../store/authors/authorsSlice";
+import { addCourse as addCourseAction } from "../../store/courses/coursesSlice";
 
 type CreateCourseFormState = {
   title: string;
@@ -53,11 +55,12 @@ const formatDate = (date: Date) => {
 };
 
 export default function CreateCourse({
-  authors: authorsProp = mockedAuthorsList,
+  authors: authorsProp = [],
   onAddAuthor,
   onAddCourse,
   onCancel,
 }: CreateCourseProps = {}) {
+  const dispatch = useAppDispatch();
   const sourceAuthors: Author[] = Array.isArray(authorsProp) ? authorsProp : [];
   const initialAuthors: Author[] = sourceAuthors.map((a) => ({
     id: a.id,
@@ -70,10 +73,7 @@ export default function CreateCourse({
   const [courseAuthors, setCourseAuthors] = useState<Author[]>([]);
   const [newAuthorName, setNewAuthorName] = useState("");
   const [authorError, setAuthorError] = useState<string | undefined>(undefined);
-  const fallbackAuthors: Author[] = [
-    { id: "fallback-1", name: "Author One" },
-    { id: "fallback-2", name: "Author Two" },
-  ];
+  const fallbackAuthors: Author[] = [];
 
   useEffect(() => {
     if (Array.isArray(authorsProp)) {
@@ -133,6 +133,7 @@ export default function CreateCourse({
 
     const newAuthor = { id: createId(), name: trimmed };
     setAuthors((prev) => [...prev, newAuthor]);
+    dispatch(addAuthorAction(newAuthor));
     onAddAuthor?.(newAuthor);
     setNewAuthorName("");
     setAuthorError(undefined);
@@ -180,6 +181,7 @@ export default function CreateCourse({
       authors: courseAuthors.map((author) => author.id),
     };
 
+    dispatch(addCourseAction(newCourse));
     onAddCourse?.(newCourse);
 
     // reset form and move authors back for next creation
