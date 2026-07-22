@@ -3,3 +3,5 @@ export function formatCreationDate(creationDate: string) {
 
     return `${day}.${month}.${year}`;
 }
+
+export default formatCreationDate;

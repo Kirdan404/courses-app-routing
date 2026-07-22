@@ -8,3 +8,5 @@ export function getCourseDuration(duration: number) {
 
     return `${formattedHours}:${formattedMinutes} ${hourText}`;
 }
+
+export default getCourseDuration;

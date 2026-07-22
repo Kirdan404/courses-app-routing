@@ -18,10 +18,10 @@ type Author = {
     name: string;
 };
 
-type CoursesProps = {
+type CoursesProps = Readonly<{
     courses: Course[];
     authorsList: Author[];
-};
+}>;
 
 function Courses({ courses, authorsList }: CoursesProps) {
     return (

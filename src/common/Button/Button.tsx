@@ -1,9 +1,9 @@
 import "./Button.css";
 
-type ButtonProps = {
+type ButtonProps = Readonly<{
     buttonText: string;
     onClick?: () => void;
-};
+}>;
 
 function Button({ buttonText, onClick }: ButtonProps) {
     return (

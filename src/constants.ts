@@ -5,7 +5,7 @@ export const ADD_NEW_COURSE_BUTTON_TEXT = "Add new course";
 export const BACK_BUTTON_TEXT = "Back";
 export const SEARCH_BUTTON_TEXT = "Search";
 export const SEARCH_INPUT_PLACEHOLDER = "Input text";
-export const EMPTY_COURSE_LIST_TITLE = "Your List is Empty";
+export const EMPTY_COURSE_LIST_TITLE = "Course List is Empty";
 export const EMPTY_COURSE_LIST_SUBTITLE = 'Please use "Add New Course" button to add your first course';
 
 export const mockedCoursesList = [

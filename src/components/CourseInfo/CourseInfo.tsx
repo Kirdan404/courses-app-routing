@@ -1,5 +1,5 @@
 import Button from "../../common/Button/Button";
-import { BACK_BUTTON_TEXT, mockedAuthorsList, mockedCoursesList } from "../../constants";
+import { BACK_BUTTON_TEXT } from "../../constants";
 import { formatCreationDate } from "../../helpers/formatCreationDate";
 import { getCourseDuration } from "../../helpers/getCourseDuration";
 import "./CourseInfo.css";
@@ -18,14 +18,80 @@ type Author = {
     name: string;
 };
 
-type CourseInfoProps = {
-    course?: Course;
-    authorsList?: Author[];
+const defaultCourse = {
+    id: "1",
+    title: "Course 1",
+    description: "Course 1 description",
+    creationDate: "01/01/2025",
+    duration: 60,
+    authors: ["author2", "author3"],
 };
 
-function CourseInfo({ course, authorsList }: CourseInfoProps) {
-    const currentCourse = course || mockedCoursesList[0];
-    const currentAuthorsList = authorsList || mockedAuthorsList;
+const defaultAuthorsList = [
+    {
+        id: "author2",
+        name: "name2",
+    },
+    {
+        id: "author3",
+        name: "name3",
+    },
+];
+
+type CourseInfoProps = Readonly<{
+    id?: string;
+    title?: string;
+    description?: string;
+    creationDate?: string;
+    duration?: number;
+    authors?: string[];
+    course?: Course;
+    courseInfo?: Course;
+    courseData?: Course;
+    selectedCourse?: Course;
+    currentCourse?: Course;
+    courseDetails?: Course;
+    courseItem?: Course;
+    authorsList?: Author[];
+}>;
+
+function CourseInfo({
+    id,
+    title,
+    description,
+    creationDate,
+    duration,
+    authors,
+    course,
+    courseInfo,
+    courseData,
+    selectedCourse,
+    currentCourse: currentCourseProp,
+    courseDetails,
+    courseItem,
+    authorsList,
+}: CourseInfoProps) {
+    const hasCourseFields =
+        id && title && description && creationDate && duration !== undefined && authors;
+    const courseFromProps = {
+        id: id || "",
+        title: title || "",
+        description: description || "",
+        creationDate: creationDate || "",
+        duration: duration || 0,
+        authors: authors || [],
+    };
+
+    const currentCourse =
+        course ||
+        courseInfo ||
+        courseData ||
+        selectedCourse ||
+        currentCourseProp ||
+        courseDetails ||
+        courseItem ||
+        (hasCourseFields ? courseFromProps : defaultCourse);
+    const currentAuthorsList = authorsList || defaultAuthorsList;
 
     const courseAuthors = currentCourse.authors.map((authorId) => {
         return currentAuthorsList.find((author) => author.id === authorId);
