@@ -1,5 +1,5 @@
 import Button from "../../common/Button/Button";
-import { BACK_BUTTON_TEXT } from "../../constants";
+import { BACK_BUTTON_TEXT, mockedAuthorsList, mockedCoursesList } from "../../constants";
 import { formatCreationDate } from "../../helpers/formatCreationDate";
 import { getCourseDuration } from "../../helpers/getCourseDuration";
 import "./CourseInfo.css";
@@ -19,13 +19,16 @@ type Author = {
 };
 
 type CourseInfoProps = {
-    course: Course;
-    authorsList: Author[];
+    course?: Course;
+    authorsList?: Author[];
 };
 
 function CourseInfo({ course, authorsList }: CourseInfoProps) {
-    const courseAuthors = course.authors.map((authorId) => {
-        return authorsList.find((author) => author.id === authorId);
+    const currentCourse = course || mockedCoursesList[0];
+    const currentAuthorsList = authorsList || mockedAuthorsList;
+
+    const courseAuthors = currentCourse.authors.map((authorId) => {
+        return currentAuthorsList.find((author) => author.id === authorId);
     });
 
     const authorsNames = courseAuthors.map((author) => author?.name).join(", ");
@@ -33,26 +36,26 @@ function CourseInfo({ course, authorsList }: CourseInfoProps) {
     return (
         <main className="course-info">
             <div className="course-info__content">
-                <h1 className="course-info__title">{course.title}</h1>
+                <h1 className="course-info__title">{currentCourse.title}</h1>
 
                 <div className="course-info__card">
                     <div className="course-info__description">
                         <h2 className="course-info__subtitle">Description:</h2>
-                        <p>{course.description}</p>
+                        <p>{currentCourse.description}</p>
                     </div>
 
                     <div className="course-info__details">
                         <p>
                             <strong>ID:</strong>
-                            <span>{course.id}</span>
+                            <span>{currentCourse.id}</span>
                         </p>
                         <p>
                             <strong>Duration:</strong>
-                            <span>{getCourseDuration(course.duration)}</span>
+                            <span>{getCourseDuration(currentCourse.duration)}</span>
                         </p>
                         <p>
                             <strong>Created:</strong>
-                            <span>{formatCreationDate(course.creationDate)}</span>
+                            <span>{formatCreationDate(currentCourse.creationDate)}</span>
                         </p>
                         <p>
                             <strong>Authors:</strong>
