@@ -1,5 +1,5 @@
 import Button from "../../../../common/Button/Button";
-import { mockedAuthorsList, SHOW_COURSE_BUTTON_TEXT } from "../../../../constants";
+import { SHOW_COURSE_BUTTON_TEXT } from "../../../../constants";
 import { formatCreationDate } from "../../../../helpers/formatCreationDate";
 import { getCourseDuration } from "../../../../helpers/getCourseDuration";
 import "./CourseCard.css";
@@ -15,12 +15,20 @@ type Course = {
 
 type CourseCardProps = {
     course: Course;
+    authorsList: Author[];
 };
 
-function CourseCard({ course }: CourseCardProps) {
-    const authorsNames = course.authors
-        .map((authorId) => mockedAuthorsList.find((author) => author.id === authorId)?.name)
-        .join(", ");
+type Author = {
+    id: string;
+    name: string;
+};
+
+function CourseCard({ course, authorsList }: CourseCardProps) {
+    const courseAuthors = course.authors.map((authorId) => {
+        return authorsList.find((author) => author.id === authorId);
+    });
+
+    const authorsNames = courseAuthors.map((author) => author?.name).join(", ");
 
     return (
         <article className="course-card">

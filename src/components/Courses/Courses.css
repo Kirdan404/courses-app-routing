@@ -1,0 +1,23 @@
+.courses {
+    min-height: calc(100vh - 80px);
+    padding: 75px 0;
+    background-color: #f7f7f7;
+}
+
+.courses__content {
+    max-width: 1122px;
+    margin: 0 auto;
+}
+
+.courses__top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.courses__list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}

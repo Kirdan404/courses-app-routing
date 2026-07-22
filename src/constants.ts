@@ -2,6 +2,8 @@ export const USER_NAME_HARRY = "Harry Potter";
 export const LOGOUT_BUTTON_TEXT = "Logout";
 export const SHOW_COURSE_BUTTON_TEXT = "Show course";
 export const ADD_NEW_COURSE_BUTTON_TEXT = "Add new course";
+export const SEARCH_BUTTON_TEXT = "Search";
+export const SEARCH_INPUT_PLACEHOLDER = "Input text";
 export const EMPTY_COURSE_LIST_TITLE = "Your List is Empty";
 export const EMPTY_COURSE_LIST_SUBTITLE = 'Please use "Add New Course" button to add your first course';
 
