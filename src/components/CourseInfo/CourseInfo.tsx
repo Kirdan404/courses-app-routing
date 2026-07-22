@@ -74,12 +74,12 @@ function CourseInfo({
     const hasCourseFields =
         id && title && description && creationDate && duration !== undefined && authors;
     const courseFromProps = {
-        id: id || "",
-        title: title || "",
-        description: description || "",
-        creationDate: creationDate || "",
-        duration: duration || 0,
-        authors: authors || [],
+        id: id ?? "",
+        title: title ?? "",
+        description: description ?? "",
+        creationDate: creationDate ?? "",
+        duration: duration ?? 0,
+        authors: authors ?? [],
     };
 
     const currentCourse =
@@ -93,11 +93,11 @@ function CourseInfo({
         (hasCourseFields ? courseFromProps : defaultCourse);
     const currentAuthorsList = authorsList || defaultAuthorsList;
 
-    const courseAuthors = currentCourse.authors.map((authorId) => {
-        return currentAuthorsList.find((author) => author.id === authorId);
-    });
+    const authorsNames = currentCourse.authors.map((authorId) => {
+        const author = currentAuthorsList.find((author) => author.id === authorId);
 
-    const authorsNames = courseAuthors.map((author) => author?.name).join(", ");
+        return author ? author.name : authorId;
+    });
 
     return (
         <main className="course-info">
@@ -125,7 +125,7 @@ function CourseInfo({
                         </p>
                         <p>
                             <strong>Authors:</strong>
-                            <span>{authorsNames}</span>
+                            <span>{authorsNames.join(", ")}</span>
                         </p>
                     </div>
                 </div>

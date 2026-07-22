@@ -74,12 +74,12 @@ function CourseCard({
     const hasCourseFields =
         id && title && description && creationDate && duration !== undefined && authors;
     const courseFromProps = {
-        id: id || "",
-        title: title || "",
-        description: description || "",
-        creationDate: creationDate || "",
-        duration: duration || 0,
-        authors: authors || [],
+        id: id ?? "",
+        title: title ?? "",
+        description: description ?? "",
+        creationDate: creationDate ?? "",
+        duration: duration ?? 0,
+        authors: authors ?? [],
     };
 
     const currentCourse =
@@ -93,11 +93,11 @@ function CourseCard({
         (hasCourseFields ? courseFromProps : defaultCourse);
     const currentAuthorsList = authorsList || defaultAuthorsList;
 
-    const courseAuthors = currentCourse.authors.map((authorId) => {
-        return currentAuthorsList.find((author) => author.id === authorId);
-    });
+    const authorsNames = currentCourse.authors.map((authorId) => {
+        const author = currentAuthorsList.find((author) => author.id === authorId);
 
-    const authorsNames = courseAuthors.map((author) => author?.name).join(", ");
+        return author ? author.name : authorId;
+    });
 
     return (
         <article className="course-card">
@@ -109,7 +109,7 @@ function CourseCard({
             <div className="course-card__info">
                 <p className="course-card__info-row">
                     <strong>Authors:</strong>
-                    <span className="course-card__authors">{authorsNames}</span>
+                    <span className="course-card__authors">{authorsNames.join(", ")}</span>
                 </p>
                 <p className="course-card__info-row">
                     <strong>Duration:</strong> {getCourseDuration(currentCourse.duration)}
