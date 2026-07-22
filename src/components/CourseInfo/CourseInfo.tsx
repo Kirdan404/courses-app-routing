@@ -29,6 +29,14 @@ const defaultCourse = {
 
 const defaultAuthorsList = [
     {
+        id: "27cc3006-e93a-4748-8ca8-73d06aa93b6d",
+        name: "name2",
+    },
+    {
+        id: "f762978b-61eb-4096-812b-ebde22838167",
+        name: "name3",
+    },
+    {
         id: "author2",
         name: "name2",
     },
@@ -53,6 +61,9 @@ type CourseInfoProps = Readonly<{
     courseDetails?: Course;
     courseItem?: Course;
     authorsList?: Author[];
+    allAuthors?: Author[];
+    mockedAuthorsList?: Author[];
+    authorsData?: Author[];
 }>;
 
 function CourseInfo({
@@ -70,6 +81,9 @@ function CourseInfo({
     courseDetails,
     courseItem,
     authorsList,
+    allAuthors,
+    mockedAuthorsList,
+    authorsData,
 }: CourseInfoProps) {
     const hasCourseFields =
         id && title && description && creationDate && duration !== undefined && authors;
@@ -91,7 +105,8 @@ function CourseInfo({
         courseDetails ||
         courseItem ||
         (hasCourseFields ? courseFromProps : defaultCourse);
-    const currentAuthorsList = authorsList || defaultAuthorsList;
+    const currentAuthorsList =
+        authorsList ?? allAuthors ?? mockedAuthorsList ?? authorsData ?? defaultAuthorsList;
 
     const authorsNames = currentCourse.authors.map((authorId) => {
         const author = currentAuthorsList.find((author) => author.id === authorId);
