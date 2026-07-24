@@ -86,7 +86,12 @@ function CourseInfo({
     authorsData,
 }: CourseInfoProps) {
     const hasCourseFields =
-        id && title && description && creationDate && duration !== undefined && authors;
+        id &&
+        title &&
+        description &&
+        creationDate &&
+        duration !== undefined &&
+        authors;
     const courseFromProps = {
         id: id ?? "",
         title: title ?? "",
@@ -106,10 +111,16 @@ function CourseInfo({
         courseItem ||
         (hasCourseFields ? courseFromProps : defaultCourse);
     const currentAuthorsList =
-        authorsList ?? allAuthors ?? mockedAuthorsList ?? authorsData ?? defaultAuthorsList;
+        authorsList ??
+        allAuthors ??
+        mockedAuthorsList ??
+        authorsData ??
+        defaultAuthorsList;
 
     const authorsNames = currentCourse.authors.map((authorId) => {
-        const author = currentAuthorsList.find((author) => author.id === authorId);
+        const author = currentAuthorsList.find(
+            (author) => author.id === authorId
+        );
 
         return author ? author.name : authorId;
     });
@@ -132,11 +143,15 @@ function CourseInfo({
                         </p>
                         <p>
                             <strong>Duration:</strong>
-                            <span>{getCourseDuration(currentCourse.duration)}</span>
+                            <span>
+                                {getCourseDuration(currentCourse.duration)}
+                            </span>
                         </p>
                         <p>
                             <strong>Created:</strong>
-                            <span>{formatCreationDate(currentCourse.creationDate)}</span>
+                            <span>
+                                {formatCreationDate(currentCourse.creationDate)}
+                            </span>
                         </p>
                         <p>
                             <strong>Authors:</strong>

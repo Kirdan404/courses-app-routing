@@ -86,7 +86,12 @@ function CourseCard({
     authorsData,
 }: CourseCardProps) {
     const hasCourseFields =
-        id && title && description && creationDate && duration !== undefined && authors;
+        id &&
+        title &&
+        description &&
+        creationDate &&
+        duration !== undefined &&
+        authors;
     const courseFromProps = {
         id: id ?? "",
         title: title ?? "",
@@ -106,10 +111,16 @@ function CourseCard({
         courseItem ||
         (hasCourseFields ? courseFromProps : defaultCourse);
     const currentAuthorsList =
-        authorsList ?? allAuthors ?? mockedAuthorsList ?? authorsData ?? defaultAuthorsList;
+        authorsList ??
+        allAuthors ??
+        mockedAuthorsList ??
+        authorsData ??
+        defaultAuthorsList;
 
     const authorsNames = currentCourse.authors.map((authorId) => {
-        const author = currentAuthorsList.find((author) => author.id === authorId);
+        const author = currentAuthorsList.find(
+            (author) => author.id === authorId
+        );
 
         return author ? author.name : authorId;
     });
@@ -118,19 +129,25 @@ function CourseCard({
         <article className="course-card">
             <div className="course-card__content">
                 <h2 className="course-card__title">{currentCourse.title}</h2>
-                <p className="course-card__description">{currentCourse.description}</p>
+                <p className="course-card__description">
+                    {currentCourse.description}
+                </p>
             </div>
 
             <div className="course-card__info">
                 <p className="course-card__info-row">
                     <strong>Authors:</strong>
-                    <span className="course-card__authors">{authorsNames.join(", ")}</span>
+                    <span className="course-card__authors">
+                        {authorsNames.join(", ")}
+                    </span>
                 </p>
                 <p className="course-card__info-row">
-                    <strong>Duration:</strong> {getCourseDuration(currentCourse.duration)}
+                    <strong>Duration:</strong>{" "}
+                    {getCourseDuration(currentCourse.duration)}
                 </p>
                 <p className="course-card__info-row">
-                    <strong>Created:</strong> {formatCreationDate(currentCourse.creationDate)}
+                    <strong>Created:</strong>{" "}
+                    {formatCreationDate(currentCourse.creationDate)}
                 </p>
 
                 <Button buttonText={SHOW_COURSE_BUTTON_TEXT} />

@@ -1,14 +1,17 @@
 import { mockedAuthorsList, mockedCoursesList } from "./constants";
 import Header from "./components/Header/Header";
-import CourseInfo from "./components/CourseInfo/CourseInfo";
 import EmptyCourseList from "./components/EmptyCourseList/EmptyCourseList";
+import Courses from "./components/Courses/Courses";
 
 function App() {
     return (
         <>
             <Header />
             {mockedCoursesList.length > 0 ? (
-                <CourseInfo course={mockedCoursesList[0]} authorsList={mockedAuthorsList} />
+                <Courses
+                    courses={mockedCoursesList}
+                    authorsList={mockedAuthorsList}
+                />
             ) : (
                 <EmptyCourseList />
             )}
