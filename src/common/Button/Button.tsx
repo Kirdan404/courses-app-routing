@@ -2,12 +2,21 @@ import "./Button.css";
 
 type ButtonProps = Readonly<{
     buttonText: string;
+    className?: string;
+    type?: "button" | "submit" | "reset";
     onClick?: () => void;
 }>;
 
-function Button({ buttonText, onClick }: ButtonProps) {
+function Button({
+    buttonText,
+    className,
+    type = "button",
+    onClick,
+}: ButtonProps) {
+    const buttonClassName = ["button", className].filter(Boolean).join(" ");
+
     return (
-        <button type="button" className="button" onClick={onClick}>
+        <button type={type} className={buttonClassName} onClick={onClick}>
             {buttonText}
         </button>
     );
