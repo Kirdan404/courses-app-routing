@@ -1,0 +1,22 @@
+.empty-course-list {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f7f7;
+}
+
+.empty-course-list__title {
+    margin: 0 0 20px;
+    font-size: 32px;
+    line-height: 40px;
+    color: #333e48;
+}
+
+.empty-course-list__subtitle {
+    margin: 0 0 40px;
+    font-size: 16px;
+    line-height: 20px;
+    color: #333e48;
+}
