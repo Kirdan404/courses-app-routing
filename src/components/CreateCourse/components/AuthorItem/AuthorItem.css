@@ -1,0 +1,48 @@
+.author-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 20px;
+    color: #333e48;
+}
+
+.author-item__name {
+    width: 88px;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.author-item__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.author-item__action.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+}
+
+.author-item__action img {
+    display: block;
+    object-fit: contain;
+}
+
+.author-item__add-icon {
+    width: 13px;
+    height: 13px;
+}
+
+.author-item__delete-icon {
+    width: 12px;
+    height: 13px;
+}

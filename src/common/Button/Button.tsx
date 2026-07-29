@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
 import "./Button.css";
 
 type ButtonProps = Readonly<{
-    buttonText: string;
+    buttonText: ReactNode;
+    ariaLabel?: string;
     className?: string;
     type?: "button" | "submit" | "reset";
     onClick?: () => void;
@@ -9,6 +11,7 @@ type ButtonProps = Readonly<{
 
 function Button({
     buttonText,
+    ariaLabel,
     className,
     type = "button",
     onClick,
@@ -16,7 +19,12 @@ function Button({
     const buttonClassName = ["button", className].filter(Boolean).join(" ");
 
     return (
-        <button type={type} className={buttonClassName} onClick={onClick}>
+        <button
+            aria-label={ariaLabel}
+            type={type}
+            className={buttonClassName}
+            onClick={onClick}
+        >
             {buttonText}
         </button>
     );
