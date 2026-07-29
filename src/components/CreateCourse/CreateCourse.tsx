@@ -1,19 +1,17 @@
 import { useState } from "react";
-import type { ChangeEvent, FormEvent } from "react";
+import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import Textarea from "../../common/Textarea/Textarea";
+import { mockedAuthorsList } from "../../constants";
 import getCourseDuration from "../../helpers/getCourseDuration";
 import type { Author, Course } from "../../types/course";
 import AuthorItem from "./components/AuthorItem/AuthorItem";
 import "./CreateCourse.css";
 
 type CreateCourseProps = Readonly<{
-    authorsList: Author[];
-    onCancel: () => void;
-    onCreateAuthor: (author: Author) => void;
-    onDeleteAuthor: (authorId: string) => void;
-    onCreateCourse: (course: Course) => void;
+    changeMode: () => void;
+    setCourses: Dispatch<SetStateAction<Course[]>>;
 }>;
 
 type CourseFormValues = {
@@ -45,17 +43,12 @@ function getCurrentDate() {
     return `${day}/${month}/${year}`;
 }
 
-function CreateCourse({
-    authorsList,
-    onCancel,
-    onCreateAuthor,
-    onDeleteAuthor,
-    onCreateCourse,
-}: CreateCourseProps) {
+function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
     const [formValues, setFormValues] =
         useState<CourseFormValues>(initialFormValues);
     const [errors, setErrors] = useState<CourseFormErrors>({});
     const [courseAuthorIds, setCourseAuthorIds] = useState<string[]>([]);
+    const [authorsList, setAuthorsList] = useState<Author[]>(mockedAuthorsList);
 
     const availableAuthors = authorsList.filter(
         (author) => !courseAuthorIds.includes(author.id)
@@ -112,10 +105,13 @@ function CreateCourse({
             return;
         }
 
-        onCreateAuthor({
-            id: generateId(),
-            name: trimmedAuthorName,
-        });
+        setAuthorsList((currentAuthors) => [
+            ...currentAuthors,
+            {
+                id: generateId(),
+                name: trimmedAuthorName,
+            },
+        ]);
         updateField("authorName", "");
     }
 
@@ -131,7 +127,9 @@ function CreateCourse({
 
     function handleDeleteAuthor(authorId: string) {
         handleRemoveCourseAuthor(authorId);
-        onDeleteAuthor(authorId);
+        setAuthorsList((currentAuthors) =>
+            currentAuthors.filter((author) => author.id !== authorId)
+        );
     }
 
     function validateCourse() {
@@ -174,14 +172,18 @@ function CreateCourse({
             return;
         }
 
-        onCreateCourse({
-            id: generateId(),
-            title: formValues.title.trim(),
-            description: formValues.description.trim(),
-            creationDate: getCurrentDate(),
-            duration: durationInMinutes,
-            authors: courseAuthorIds,
-        });
+        setCourses((currentCourses) => [
+            ...currentCourses,
+            {
+                id: generateId(),
+                title: formValues.title.trim(),
+                description: formValues.description.trim(),
+                creationDate: getCurrentDate(),
+                duration: durationInMinutes,
+                authors: courseAuthorIds,
+            },
+        ]);
+        changeMode();
     }
 
     return (
@@ -291,7 +293,7 @@ function CreateCourse({
             </form>
 
             <div className="create-course__actions">
-                <Button buttonText="Cancel" onClick={onCancel} />
+                <Button buttonText="Cancel" onClick={changeMode} />
                 <Button
                     buttonText="Create course"
                     form="create-course-form"
