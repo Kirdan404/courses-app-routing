@@ -1,22 +1,9 @@
 import Button from "../../common/Button/Button";
 import { ADD_NEW_COURSE_BUTTON_TEXT } from "../../constants";
+import type { Author, Course } from "../../types/course";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
-
-type Course = {
-    id: string;
-    title: string;
-    description: string;
-    creationDate: string;
-    duration: number;
-    authors: string[];
-};
-
-type Author = {
-    id: string;
-    name: string;
-};
 
 type CoursesProps = Readonly<{
     courses: Course[];

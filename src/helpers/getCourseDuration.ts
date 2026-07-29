@@ -1,4 +1,4 @@
-export function getCourseDuration(duration: number) {
+export default function getCourseDuration(duration: number) {
     const hours = Math.floor(duration / 60);
     const minutes = duration % 60;
 
@@ -8,5 +8,3 @@ export function getCourseDuration(duration: number) {
 
     return `${formattedHours}:${formattedMinutes} ${hourText}`;
 }
-
-export default getCourseDuration;

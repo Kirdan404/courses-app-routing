@@ -1,3 +1,5 @@
+import type { Author, Course } from "./types/course";
+
 export const USER_NAME_HARRY = "Harry Potter";
 export const LOGOUT_BUTTON_TEXT = "Logout";
 export const SHOW_COURSE_BUTTON_TEXT = "Show course";
@@ -9,7 +11,7 @@ export const EMPTY_COURSE_LIST_TITLE = "Course List is Empty";
 export const EMPTY_COURSE_LIST_SUBTITLE =
     'Please use "Add New Course" button to add your first course';
 
-export const mockedCoursesList = [
+export const mockedCoursesList: Course[] = [
     {
         id: "de5aaa59-90f5-4dbc-b8a9-aaf205c551ba",
         title: "JavaScript",
@@ -40,7 +42,7 @@ export const mockedCoursesList = [
     },
 ];
 
-export const mockedAuthorsList = [
+export const mockedAuthorsList: Author[] = [
     {
         id: "27cc3006-e93a-4748-8ca8-73d06aa93b6d",
         name: "Vasiliy Dobkin",
