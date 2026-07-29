@@ -7,11 +7,9 @@
 }
 
 .author-item__name {
-    width: 88px;
-    overflow: hidden;
+    width: 160px;
     font-size: 16px;
     line-height: 20px;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -30,11 +28,11 @@
     padding: 0;
     background: transparent;
     border-radius: 0;
+    color: #333e48;
 }
 
-.author-item__action img {
+.author-item__action svg {
     display: block;
-    object-fit: contain;
 }
 
 .author-item__add-icon {
@@ -43,6 +41,6 @@
 }
 
 .author-item__delete-icon {
-    width: 12px;
+    width: 13px;
     height: 13px;
 }
