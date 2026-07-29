@@ -1,11 +1,11 @@
 import Header from "./components/Header/Header";
-import Registration from "./components/Registration/Registration";
+import Login from "./components/Login/Login";
 
 function App() {
     return (
         <>
             <Header showUserActions={false} />
-            <Registration />
+            <Login />
         </>
     );
 }
