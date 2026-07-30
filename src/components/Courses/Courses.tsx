@@ -14,6 +14,18 @@ function Courses() {
     const [courses, setCourses] = useState(mockedCoursesList);
     const [isCreateCourseMode, setIsCreateCourseMode] =
         useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+    const filteredCourses = courses.filter((course) => {
+        const title = course.title.toLowerCase();
+        const id = course.id.toLowerCase();
+
+        return (
+            title.includes(normalizedSearchQuery) ||
+            id.includes(normalizedSearchQuery)
+        );
+    });
 
     const changeMode = () => {
         setIsCreateCourseMode(!isCreateCourseMode);
@@ -27,7 +39,7 @@ function Courses() {
         <main className="courses">
             <div className="courses__content">
                 <div className="courses__top-bar">
-                    <SearchBar />
+                    <SearchBar onSearch={setSearchQuery} />
                     <Button
                         buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
                         onClick={changeMode}
@@ -35,7 +47,7 @@ function Courses() {
                 </div>
 
                 <div className="courses__list">
-                    {courses.map((course) => (
+                    {filteredCourses.map((course) => (
                         <CourseCard
                             key={course.id}
                             course={course}
