@@ -1,49 +1,38 @@
 import Button from "../../common/Button/Button";
 import AddIcon from "../../common/Icons/AddIcon";
 import TrashIcon from "../../common/Icons/TrashIcon";
+import type { Author } from "../../types/course";
 import "./AuthorItem.css";
 
 type AuthorItemProps = Readonly<{
-    authorName: string;
-    onAdd?: () => void;
-    onDelete?: () => void;
+    author: Author;
+    buttonText: string;
+    onButtonClick: (authorId: string) => void;
 }>;
 
-function AuthorItem({ authorName, onAdd, onDelete }: AuthorItemProps) {
+function AuthorItem({ author, buttonText, onButtonClick }: AuthorItemProps) {
+    const isDeleteButton = buttonText.toLowerCase().includes("delete");
+
     return (
         <div className="author-item">
-            <span className="author-item__name">{authorName}</span>
+            <span className="author-item__name">{author.name}</span>
             <div className="author-item__actions">
-                {onAdd && (
-                    <Button
-                        ariaLabel={`Add ${authorName}`}
-                        buttonText={
-                            <>
-                                <AddIcon className="author-item__add-icon" />
-                                <span className="author-item__action-text">
-                                    Add author
-                                </span>
-                            </>
-                        }
-                        className="author-item__action"
-                        onClick={onAdd}
-                    />
-                )}
-                {onDelete && (
-                    <Button
-                        ariaLabel={`Delete ${authorName}`}
-                        buttonText={
-                            <>
+                <Button
+                    buttonText={
+                        <>
+                            {isDeleteButton ? (
                                 <TrashIcon className="author-item__delete-icon" />
-                                <span className="author-item__action-text">
-                                    Delete author
-                                </span>
-                            </>
-                        }
-                        className="author-item__action"
-                        onClick={onDelete}
-                    />
-                )}
+                            ) : (
+                                <AddIcon className="author-item__add-icon" />
+                            )}
+                            <span className="author-item__action-text">
+                                {buttonText}
+                            </span>
+                        </>
+                    }
+                    className="author-item__action"
+                    onClick={() => onButtonClick(author.id)}
+                />
             </div>
         </div>
     );

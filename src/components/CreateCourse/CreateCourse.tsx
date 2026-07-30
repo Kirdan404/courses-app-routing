@@ -142,7 +142,7 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
 
         if (!formValues.duration || durationInMinutes <= 0) {
             validationErrors.duration =
-                "Duration is required and should be more than 0 minutes.";
+                "Duration is required and should be greater than 0.";
         }
 
         return validationErrors;
@@ -161,20 +161,19 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
             return;
         }
 
-        setCourses((currentCourses) => [
-            ...currentCourses,
-            {
-                id: generateId(),
-                title: formValues.title.trim(),
-                description: formValues.description.trim(),
-                creationDate: getCurrentDate(),
-                duration: durationInMinutes,
-                authors: courseAuthorIds,
-            },
-        ]);
-        setFormValues(initialFormValues);
+        const newCourse: Course = {
+            id: generateId(),
+            title: formValues.title.trim(),
+            description: formValues.description.trim(),
+            creationDate: getCurrentDate(),
+            duration: durationInMinutes,
+            authors: courseAuthorIds,
+        };
+
+        setFormValues({ ...initialFormValues });
         setCourseAuthorIds([]);
         setErrors({});
+        setCourses((currentCourses) => [...currentCourses, newCourse]);
         changeMode();
     }
 
@@ -250,8 +249,9 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
                                 availableAuthors.map((author) => (
                                     <AuthorItem
                                         key={author.id}
-                                        authorName={author.name}
-                                        onAdd={() => handleAddAuthor(author.id)}
+                                        author={author}
+                                        buttonText="Add author"
+                                        onButtonClick={handleAddAuthor}
                                     />
                                 ))
                             ) : (
@@ -267,10 +267,9 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
                                 courseAuthors.map((author) => (
                                     <AuthorItem
                                         key={author.id}
-                                        authorName={author.name}
-                                        onDelete={() =>
-                                            handleRemoveCourseAuthor(author.id)
-                                        }
+                                        author={author}
+                                        buttonText="Delete author"
+                                        onButtonClick={handleRemoveCourseAuthor}
                                     />
                                 ))
                             ) : (
