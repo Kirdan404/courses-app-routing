@@ -10,8 +10,8 @@ import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CreateCourse.css";
 
 type CreateCourseProps = Readonly<{
-    changeMode: () => void;
-    setCourses: Dispatch<SetStateAction<Course[]>>;
+    changeMode?: () => void;
+    setCourses?: Dispatch<SetStateAction<Course[]>>;
 }>;
 
 type CourseFormValues = {
@@ -173,8 +173,8 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
         setFormValues({ ...initialFormValues });
         setCourseAuthorIds([]);
         setErrors({});
-        setCourses((currentCourses) => [...currentCourses, newCourse]);
-        changeMode();
+        setCourses?.((currentCourses) => [...currentCourses, newCourse]);
+        changeMode?.();
     }
 
     return (
