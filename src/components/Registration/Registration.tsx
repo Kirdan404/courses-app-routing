@@ -110,7 +110,7 @@ function Registration() {
                 </div>
 
                 <Button
-                    buttonText="Registration"
+                    buttonText="Register"
                     className="registration__submit"
                     type="submit"
                 />

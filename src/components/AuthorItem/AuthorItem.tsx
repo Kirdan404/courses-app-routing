@@ -1,6 +1,6 @@
-import Button from "../../../../common/Button/Button";
-import AddIcon from "../../../../common/Icons/AddIcon";
-import TrashIcon from "../../../../common/Icons/TrashIcon";
+import Button from "../../common/Button/Button";
+import AddIcon from "../../common/Icons/AddIcon";
+import TrashIcon from "../../common/Icons/TrashIcon";
 import "./AuthorItem.css";
 
 type AuthorItemProps = Readonly<{
@@ -18,7 +18,12 @@ function AuthorItem({ authorName, onAdd, onDelete }: AuthorItemProps) {
                     <Button
                         ariaLabel={`Add ${authorName}`}
                         buttonText={
-                            <AddIcon className="author-item__add-icon" />
+                            <>
+                                <AddIcon className="author-item__add-icon" />
+                                <span className="author-item__action-text">
+                                    Add author
+                                </span>
+                            </>
                         }
                         className="author-item__action"
                         onClick={onAdd}
@@ -28,7 +33,12 @@ function AuthorItem({ authorName, onAdd, onDelete }: AuthorItemProps) {
                     <Button
                         ariaLabel={`Delete ${authorName}`}
                         buttonText={
-                            <TrashIcon className="author-item__delete-icon" />
+                            <>
+                                <TrashIcon className="author-item__delete-icon" />
+                                <span className="author-item__action-text">
+                                    Delete author
+                                </span>
+                            </>
                         }
                         className="author-item__action"
                         onClick={onDelete}

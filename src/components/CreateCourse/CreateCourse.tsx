@@ -6,7 +6,7 @@ import Textarea from "../../common/Textarea/Textarea";
 import { mockedAuthorsList } from "../../constants";
 import getCourseDuration from "../../helpers/getCourseDuration";
 import type { Author, Course } from "../../types/course";
-import AuthorItem from "./components/AuthorItem/AuthorItem";
+import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CreateCourse.css";
 
 type CreateCourseProps = Readonly<{
@@ -125,35 +125,24 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
         );
     }
 
-    function handleDeleteAuthor(authorId: string) {
-        handleRemoveCourseAuthor(authorId);
-        setAuthorsList((currentAuthors) =>
-            currentAuthors.filter((author) => author.id !== authorId)
-        );
-    }
-
     function validateCourse() {
         const validationErrors: CourseFormErrors = {};
         const trimmedTitle = formValues.title.trim();
         const trimmedDescription = formValues.description.trim();
 
-        if (!trimmedTitle) {
-            validationErrors.title = "Title is required.";
-        } else if (trimmedTitle.length < 2) {
-            validationErrors.title = "Title should be at least 2 characters.";
+        if (trimmedTitle.length < 2) {
+            validationErrors.title =
+                "Title is required and should be at least 2 characters.";
         }
 
-        if (!trimmedDescription) {
-            validationErrors.description = "Description is required.";
-        } else if (trimmedDescription.length < 2) {
+        if (trimmedDescription.length < 2) {
             validationErrors.description =
-                "Description should be at least 2 characters.";
+                "Description is required and should be at least 2 characters.";
         }
 
-        if (!formValues.duration) {
-            validationErrors.duration = "Duration is required.";
-        } else if (durationInMinutes <= 0) {
-            validationErrors.duration = "Duration should be greater than 0.";
+        if (!formValues.duration || durationInMinutes <= 0) {
+            validationErrors.duration =
+                "Duration is required and should be more than 0 minutes.";
         }
 
         return validationErrors;
@@ -183,6 +172,9 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
                 authors: courseAuthorIds,
             },
         ]);
+        setFormValues(initialFormValues);
+        setCourseAuthorIds([]);
+        setErrors({});
         changeMode();
     }
 
@@ -260,9 +252,6 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
                                         key={author.id}
                                         authorName={author.name}
                                         onAdd={() => handleAddAuthor(author.id)}
-                                        onDelete={() =>
-                                            handleDeleteAuthor(author.id)
-                                        }
                                     />
                                 ))
                             ) : (
