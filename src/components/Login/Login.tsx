@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import "./Login.css";
@@ -11,15 +12,27 @@ type LoginFormValues = {
 
 type LoginFormErrors = Partial<Record<keyof LoginFormValues, string>>;
 
+type LoginResponse = {
+    successful?: boolean;
+    result?: string;
+    errors?: string[];
+};
+
+type LoginProps = Readonly<{
+    onLoginSuccess?: () => void;
+}>;
+
 const initialFormValues: LoginFormValues = {
     email: "",
     password: "",
 };
 
-function Login() {
+function Login({ onLoginSuccess }: LoginProps) {
+    const navigate = useNavigate();
     const [formValues, setFormValues] =
         useState<LoginFormValues>(initialFormValues);
     const [errors, setErrors] = useState<LoginFormErrors>({});
+    const [serverError, setServerError] = useState("");
 
     function handleChange(event: ChangeEvent<HTMLInputElement>) {
         const fieldName = event.target.name as keyof LoginFormValues;
@@ -38,7 +51,7 @@ function Login() {
         }
     }
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
         const validationErrors: LoginFormErrors = {};
@@ -57,7 +70,32 @@ function Login() {
             return;
         }
 
-        // Login request will be implemented when the API is connected.
+        setServerError("");
+
+        try {
+            const response = await fetch("http://localhost:4000/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: formValues.email.trim(),
+                    password: formValues.password,
+                }),
+            });
+            const result = (await response.json()) as LoginResponse;
+
+            if ((response.ok || result.successful) && result.result) {
+                localStorage.setItem("token", result.result);
+                onLoginSuccess?.();
+                navigate("/courses");
+                return;
+            }
+
+            setServerError(result.errors?.join(", ") || "Login failed.");
+        } catch {
+            setServerError("Unable to connect to the server.");
+        }
     }
 
     return (
@@ -94,9 +132,15 @@ function Login() {
                     type="submit"
                 />
 
+                {serverError && (
+                    <p className="login__error" role="alert">
+                        {serverError}
+                    </p>
+                )}
+
                 <p className="login__registration-message">
                     If you don&apos;t have an account you may{" "}
-                    <a href="/registration">Registration</a>
+                    <Link to="/registration">Registration</Link>
                 </p>
             </form>
         </main>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Courses from "./components/Courses/Courses";
@@ -6,11 +7,22 @@ import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
 
 function App() {
+    const [isAuthenticated, setIsAuthenticated] = useState(
+        Boolean(localStorage.getItem("token"))
+    );
+
     return (
         <BrowserRouter>
-            <Header showUserActions={Boolean(localStorage.getItem("token"))} />
+            <Header showUserActions={isAuthenticated} />
             <Routes>
-                <Route path="/login" element={<Login />} />
+                <Route
+                    path="/login"
+                    element={
+                        <Login
+                            onLoginSuccess={() => setIsAuthenticated(true)}
+                        />
+                    }
+                />
                 <Route path="/registration" element={<Registration />} />
                 <Route
                     path="/courses"
