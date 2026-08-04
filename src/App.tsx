@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import type { Dispatch, SetStateAction } from "react";
+import {
+    BrowserRouter,
+    Navigate,
+    Route,
+    Routes,
+    useNavigate,
+} from "react-router-dom";
 import Header from "./components/Header/Header";
 import CourseInfo from "./components/CourseInfo/CourseInfo";
 import Courses from "./components/Courses/Courses";
@@ -7,11 +14,29 @@ import CreateCourse from "./components/CreateCourse/CreateCourse";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
+import { mockedCoursesList } from "./constants";
+import type { Course } from "./types/course";
+
+type CreateCoursePageProps = Readonly<{
+    setCourses: Dispatch<SetStateAction<Course[]>>;
+}>;
+
+function CreateCoursePage({ setCourses }: CreateCoursePageProps) {
+    const navigate = useNavigate();
+
+    return (
+        <CreateCourse
+            changeMode={() => navigate("/courses")}
+            setCourses={setCourses}
+        />
+    );
+}
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
         Boolean(localStorage.getItem("token"))
     );
+    const [courses, setCourses] = useState<Course[]>(mockedCoursesList);
 
     return (
         <BrowserRouter>
@@ -30,7 +55,7 @@ function App() {
                     path="/courses"
                     element={
                         <PrivateRoute>
-                            <Courses />
+                            <Courses courses={courses} />
                         </PrivateRoute>
                     }
                 />
@@ -38,7 +63,7 @@ function App() {
                     path="/courses/add"
                     element={
                         <PrivateRoute>
-                            <CreateCourse />
+                            <CreateCoursePage setCourses={setCourses} />
                         </PrivateRoute>
                     }
                 />
@@ -46,7 +71,7 @@ function App() {
                     path="/courses/:courseId"
                     element={
                         <PrivateRoute>
-                            <CourseInfo />
+                            <CourseInfo courses={courses} />
                         </PrivateRoute>
                     }
                 />

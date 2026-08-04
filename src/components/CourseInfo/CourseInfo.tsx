@@ -6,11 +6,20 @@ import {
 } from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
+import type { Author, Course } from "../../types/course";
 import "./CourseInfo.css";
 
-function CourseInfo() {
+type CourseInfoProps = Readonly<{
+    courses?: Course[];
+    authorsList?: Author[];
+}>;
+
+function CourseInfo({
+    courses = mockedCoursesList,
+    authorsList = mockedAuthorsList,
+}: CourseInfoProps) {
     const { courseId } = useParams<{ courseId: string }>();
-    const course = mockedCoursesList.find(
+    const course = courses.find(
         (currentCourse) => currentCourse.id === courseId
     );
 
@@ -19,7 +28,7 @@ function CourseInfo() {
     }
 
     const authorsNames = course.authors.map((authorId) => {
-        const author = mockedAuthorsList.find(
+        const author = authorsList.find(
             (currentAuthor) => currentAuthor.id === authorId
         );
 

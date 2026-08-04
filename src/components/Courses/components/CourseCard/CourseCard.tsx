@@ -8,9 +8,10 @@ import "./CourseCard.css";
 type CourseCardProps = Readonly<{
     course: Course;
     authorsList: Author[];
+    onShowCourse?: (courseId: string) => void;
 }>;
 
-function CourseCard({ course, authorsList }: CourseCardProps) {
+function CourseCard({ course, authorsList, onShowCourse }: CourseCardProps) {
     const authorsNames = course.authors.map((authorId) => {
         const author = authorsList.find((author) => author.id === authorId);
 
@@ -40,7 +41,10 @@ function CourseCard({ course, authorsList }: CourseCardProps) {
                     {formatCreationDate(course.creationDate)}
                 </p>
 
-                <Button buttonText={SHOW_COURSE_BUTTON_TEXT} />
+                <Button
+                    buttonText={SHOW_COURSE_BUTTON_TEXT}
+                    onClick={() => onShowCourse?.(course.id)}
+                />
             </div>
         </article>
     );

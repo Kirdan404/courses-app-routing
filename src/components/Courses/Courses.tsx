@@ -6,13 +6,17 @@ import {
     mockedAuthorsList,
     mockedCoursesList,
 } from "../../constants";
+import type { Course } from "../../types/course";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
 
-function Courses() {
+type CoursesProps = Readonly<{
+    courses?: Course[];
+}>;
+
+function Courses({ courses = mockedCoursesList }: CoursesProps) {
     const navigate = useNavigate();
-    const courses = mockedCoursesList;
     const [searchQuery, setSearchQuery] = useState("");
 
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
@@ -43,6 +47,9 @@ function Courses() {
                             key={course.id}
                             course={course}
                             authorsList={mockedAuthorsList}
+                            onShowCourse={(courseId) =>
+                                navigate(`/courses/${courseId}`)
+                            }
                         />
                     ))}
                 </div>
