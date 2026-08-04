@@ -1,0 +1,39 @@
+.textarea {
+    display: flex;
+    flex-direction: column;
+}
+
+.textarea__label {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+    color: #333e48;
+}
+
+.textarea__field {
+    width: 100%;
+    min-height: 152px;
+    padding: 13px 16px;
+    resize: vertical;
+    background-color: #ffffff;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 16px;
+    line-height: 24px;
+    color: #333e48;
+}
+
+.textarea__field::placeholder {
+    color: #cfcfcf;
+}
+
+.textarea__field--error {
+    border-color: #ff0000;
+}
+
+.textarea__error {
+    font-size: 16px;
+    line-height: 20px;
+    color: #ff0000;
+}

@@ -1,148 +1,126 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import type { ChangeEvent, FormEvent } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import "./Registration.css";
 
-type RegistrationFormState = {
-  name: string;
-  email: string;
-  password: string;
+type RegistrationFormValues = {
+    name: string;
+    email: string;
+    password: string;
 };
 
-type RegistrationProps = {
-  onRegisterSuccess?: (name: string) => void;
-};
+type RegistrationFormErrors = Partial<
+    Record<keyof RegistrationFormValues, string>
+>;
 
-export default function Registraion({ onRegisterSuccess }: RegistrationProps) {
-  const navigate = useNavigate();
-  const [form, setForm] = useState<RegistrationFormState>({
+const initialFormValues: RegistrationFormValues = {
     name: "",
     email: "",
     password: "",
-  });
-  const [errors, setErrors] = useState<Partial<RegistrationFormState>>({});
-  const [apiError, setApiError] = useState<string | null>(null);
+};
 
-  const handleChange =
-    (field: keyof RegistrationFormState) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    };
+function Registration() {
+    const [formValues, setFormValues] =
+        useState<RegistrationFormValues>(initialFormValues);
+    const [errors, setErrors] = useState<RegistrationFormErrors>({});
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const nextErrors: Partial<RegistrationFormState> = {};
+    function handleChange(event: ChangeEvent<HTMLInputElement>) {
+        const fieldName = event.target.name as keyof RegistrationFormValues;
+        const { value } = event.target;
 
-    if (!form.name.trim()) nextErrors.name = "Name is required.";
-    if (!form.email.trim()) {
-      nextErrors.email = "Email is required.";
-    } else {
-      const isEmailValid = /\S+@\S+\.\S+/.test(form.email);
-      if (!isEmailValid) {
-        nextErrors.email = "Email is invalid.";
-      }
+        setFormValues((currentValues) => ({
+            ...currentValues,
+            [fieldName]: value,
+        }));
+
+        if (errors[fieldName] && value.trim()) {
+            setErrors((currentErrors) => ({
+                ...currentErrors,
+                [fieldName]: undefined,
+            }));
+        }
     }
-    if (!form.password.trim()) nextErrors.password = "Password is required.";
 
-    setErrors(nextErrors);
+    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
 
-    const hasErrors = Object.values(nextErrors).some(Boolean);
-    if (hasErrors) return;
+        const validationErrors: RegistrationFormErrors = {};
 
-    try {
-      const response = await fetch("http://localhost:4000/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name.trim(),
-          email: form.email.trim(),
-          password: form.password,
-        }),
-      });
+        if (!formValues.name.trim()) {
+            validationErrors.name = "Name is required.";
+        }
 
-      const result = await response.json();
+        if (!formValues.email.trim()) {
+            validationErrors.email = "Email is required.";
+        }
 
-      if (!response.ok) {
-        setApiError(result?.result || "Registration failed");
-        return;
-      }
+        if (!formValues.password.trim()) {
+            validationErrors.password = "Password is required.";
+        }
 
-      if (result?.user?.name) {
-        localStorage.setItem("user", result.user.name);
-        onRegisterSuccess?.(result.user.name);
-      } else {
-        localStorage.removeItem("user");
-        onRegisterSuccess?.("");
-      }
+        setErrors(validationErrors);
 
-      navigate("/login");
-    } catch (err) {
-      setApiError("Network error. Please try again.");
+        if (Object.keys(validationErrors).length > 0) {
+            return;
+        }
+
+        // Registration request will be implemented when the API is connected.
     }
-  };
 
-  return (
-    <div className="registration-container">
-      <h3 className="registration-title">Registration</h3>
+    return (
+        <main className="registration">
+            <h1 className="registration__title">Registration</h1>
 
-      <div className="registration-form-container">
-        <form className="registration-form" onSubmit={handleSubmit} noValidate>
-          <div className="registration-field">
-            <Input
-              labelText="Name"
-              placeholderText="Input text"
-              type="text"
-              value={form.name}
-              onChange={handleChange("name")}
-              className={errors.name ? "input-error" : undefined}
-            />
-            {errors.name && <span className="validation-error">{errors.name}</span>}
-          </div>
+            <form
+                className="registration__form"
+                noValidate
+                onSubmit={handleSubmit}
+            >
+                <div className="registration__fields">
+                    <Input
+                        errorText={errors.name}
+                        labelText="Name"
+                        name="name"
+                        placeholderText="Input text"
+                        required
+                        value={formValues.name}
+                        onChange={handleChange}
+                    />
+                    <Input
+                        errorText={errors.email}
+                        labelText="Email"
+                        name="email"
+                        placeholderText="Input text"
+                        required
+                        type="email"
+                        value={formValues.email}
+                        onChange={handleChange}
+                    />
+                    <Input
+                        errorText={errors.password}
+                        labelText="Password"
+                        name="password"
+                        placeholderText="Input text"
+                        required
+                        type="password"
+                        value={formValues.password}
+                        onChange={handleChange}
+                    />
+                </div>
 
-          <div className="registration-field">
-            <Input
-              labelText="Email"
-              placeholderText="Input text"
-              type="email"
-              value={form.email}
-              onChange={handleChange("email")}
-              className={errors.email ? "input-error" : undefined}
-            />
-            {errors.email && <span className="validation-error">{errors.email}</span>}
-          </div>
+                <Button
+                    buttonText="Register"
+                    className="registration__submit"
+                    type="submit"
+                />
 
-          <div className="registration-field">
-            <Input
-              labelText="Password"
-              placeholderText="Input text"
-              type="password"
-              value={form.password}
-              onChange={handleChange("password")}
-              className={errors.password ? "input-error" : undefined}
-            />
-            {errors.password && (
-              <span className="validation-error">{errors.password}</span>
-            )}
-          </div>
-
-          <Button
-            buttonText="REGISTER"
-            className="btn-primary btn-registration-login"
-            type="submit"
-            ariaLabel="Register"
-            onClick={() => {}}
-          />
-          {apiError && <span className="validation-error">{apiError}</span>}
-
-          <p className="registration-info">
-            If you have an account you may <b><Link to="/login">Login</Link></b> or{" "}
-            <b>Registration</b>
-          </p>
-        </form>
-      </div>
-    </div>
-  );
+                <p className="registration__login-message">
+                    If you have an account you may <a href="/login">Login</a>
+                </p>
+            </form>
+        </main>
+    );
 }
+
+export default Registration;

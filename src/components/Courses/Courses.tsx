@@ -1,81 +1,49 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import Button from "../../common/Button/Button";
+import {
+    ADD_NEW_COURSE_BUTTON_TEXT,
+    mockedAuthorsList,
+    mockedCoursesList,
+} from "../../constants";
+import CreateCourse from "../CreateCourse/CreateCourse";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
-import { mockedAuthorsList, mockedCoursesList } from "../../constants";
 
-type Author = {
-    id: string;
-    name: string;
-};
-
-type Course = {
-    id: string;
-    title: string;
-    description: string;
-    duration: number | string;
-    creationDate: string;
-    authors: string[];
-};
-
-type CoursesProps = {
-    courses?: Course[];
-    authors?: Author[];
-    onShowCourse?: (courseId: string) => void;
-    onAddCourseClick?: () => void;
-};
-
-const Courses = ({
-    courses = mockedCoursesList,
-    authors = mockedAuthorsList,
-    onShowCourse = () => {},
-    onAddCourseClick,
-}: CoursesProps) => {
+function Courses() {
+    const [courses, setCourses] = useState(mockedCoursesList);
+    const [isCreateCourseMode, setIsCreateCourseMode] =
+        useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const effectiveCourses = (courses && courses.length ? courses : mockedCoursesList) || [];
-    const effectiveAuthors = (authors && authors.length ? authors : mockedAuthorsList) || [];
 
-    const authorsDictionary = useMemo(() => {
-        const dictionary: Record<string, string> = {};
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+    const filteredCourses = courses.filter((course) => {
+        const title = course.title.toLowerCase();
+        const id = course.id.toLowerCase();
 
-        (effectiveAuthors || []).forEach((author) => {
-            dictionary[author.id] = author.name;
-        });
+        return (
+            title.includes(normalizedSearchQuery) ||
+            id.includes(normalizedSearchQuery)
+        );
+    });
 
-        return dictionary;
-    }, [effectiveAuthors]);
+    const changeMode = () => {
+        setIsCreateCourseMode(!isCreateCourseMode);
+    };
 
-    const resolveAuthorNames = (authorIds: string[]) =>
-        authorIds
-            .map((authorId) => authorsDictionary[authorId])
-            .filter((name): name is string => Boolean(name));
-
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-
-    const filteredCourses = useMemo(() => {
-        if (!normalizedQuery) return effectiveCourses;
-
-        return effectiveCourses.filter((course) => {
-            const titleMatch = course.title.toLowerCase().includes(normalizedQuery);
-            const idMatch = course.id.toLowerCase().includes(normalizedQuery);
-            return titleMatch || idMatch;
-        });
-    }, [effectiveCourses, normalizedQuery]);
+    if (isCreateCourseMode) {
+        return <CreateCourse changeMode={changeMode} setCourses={setCourses} />;
+    }
 
     return (
-        <section className="courses">
+        <main className="courses">
             <div className="courses__content">
-                <div className="courses__toolbar">
+                <div className="courses__top-bar">
                     <SearchBar onSearch={setSearchQuery} />
-                    <Link to="/courses/add">
-                        <Button
-                            className="courses__add-button"
-                            buttonText="Create course"
-                            onClick={onAddCourseClick || (() => {})}
-                        />
-                    </Link>
+                    <Button
+                        buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
+                        onClick={changeMode}
+                    />
                 </div>
 
                 <div className="courses__list">
@@ -83,19 +51,13 @@ const Courses = ({
                         <CourseCard
                             key={course.id}
                             course={course}
-                            title={course.title}
-                            description={course.description}
-                            duration={course.duration}
-                            creationDate={course.creationDate}
-                            authors={resolveAuthorNames(course.authors)}
-                            allAuthors={authors}
-                            onShow={() => onShowCourse(course.id)}
+                            authorsList={mockedAuthorsList}
                         />
                     ))}
                 </div>
             </div>
-        </section>
+        </main>
     );
-};
+}
 
 export default Courses;

@@ -1,38 +1,70 @@
-type InputProps = {
-  labelText?: string;
-  placeholderText?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type?: string;
-  name?: string;
-  value?: string;
-  className?: string;
-  id?: string;
-  labelClassName?: string;
-};
+import { useId } from "react";
+import type { ChangeEventHandler, HTMLInputTypeAttribute } from "react";
+import "./Input.css";
 
-export default function Input({
-  labelText,
-  placeholderText,
-  onChange,
-  type = "text",
-  name,
-  value,
-  className,
-  id,
-  labelClassName,
+type InputProps = Readonly<{
+    labelText: string;
+    placeholderText: string;
+    className?: string;
+    errorText?: string;
+    hideLabel?: boolean;
+    id?: string;
+    name?: string;
+    required?: boolean;
+    type?: HTMLInputTypeAttribute;
+    value?: string;
+    onChange?: ChangeEventHandler<HTMLInputElement>;
+}>;
+
+function Input({
+    labelText,
+    placeholderText,
+    className,
+    errorText,
+    hideLabel = false,
+    id,
+    name,
+    required = false,
+    type = "text",
+    value,
+    onChange,
 }: InputProps) {
-  return (
-    <label className={labelClassName}>
-      {labelText}
-      <input
-        id={id}
-        className={className}
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholderText}
-      />
-    </label>
-  );
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+    const errorId = `${inputId}-error`;
+    const labelClassName = hideLabel
+        ? "input__label input__label--visually-hidden"
+        : "input__label";
+    const inputClassName = [
+        "input__field",
+        className,
+        errorText ? "input__field--error" : "",
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+    return (
+        <label className="input">
+            <span className={labelClassName}>{labelText}</span>
+            <input
+                aria-describedby={errorText ? errorId : undefined}
+                aria-invalid={Boolean(errorText)}
+                className={inputClassName}
+                id={inputId}
+                name={name}
+                placeholder={placeholderText}
+                required={required}
+                type={type}
+                value={value}
+                onChange={onChange}
+            />
+            {errorText && (
+                <span className="input__error" id={errorId} role="alert">
+                    {errorText}
+                </span>
+            )}
+        </label>
+    );
 }
+
+export default Input;

@@ -1,86 +1,62 @@
 import Button from "../../common/Button/Button";
+import { BACK_BUTTON_TEXT } from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
-import { mockedAuthorsList, mockedCoursesList } from "../../constants";
+import type { Author, Course } from "../../types/course";
 import "./CourseInfo.css";
-import { Link } from "react-router-dom";
 
-type CourseInfoProps = {
-  id: string;
-  title: string;
-  description: string;
-  duration: number | string;
-  creationDate: string;
-  authors?: string[];
-  onBack?: () => void;
-};
+type CourseInfoProps = Readonly<{
+    course: Course;
+    authorsList: Author[];
+    onBack: () => void;
+}>;
 
-const authorNameById: Record<string, string> = {};
-mockedAuthorsList.forEach((author) => {
-  authorNameById[author.id] = author.name;
-});
+function CourseInfo({ course, authorsList, onBack }: CourseInfoProps) {
+    const authorsNames = course.authors.map((authorId) => {
+        const author = authorsList.find((author) => author.id === authorId);
 
-export default function CourseInfo({
-  id,
-  title,
-  description,
-  duration,
-  creationDate,
-  authors,
-  onBack,
-}: CourseInfoProps) {
-  const courseFromMocks =
-    mockedCoursesList.find((course) => course.id === id) || mockedCoursesList[0];
+        return author ? author.name : authorId;
+    });
 
-  const resolvedTitle = title || courseFromMocks?.title || "";
-  const resolvedDescription = description || courseFromMocks?.description || "";
-  const resolvedDuration = duration ?? courseFromMocks?.duration ?? 0;
-  const resolvedCreationDate = creationDate || courseFromMocks?.creationDate || "";
+    return (
+        <main className="course-info">
+            <div className="course-info__content">
+                <h1 className="course-info__title">{course.title}</h1>
 
-  const rawAuthors = (authors && authors.length ? authors : courseFromMocks?.authors) || [];
-  const resolvedAuthors = rawAuthors.map((author) => authorNameById[author] || author);
+                <div className="course-info__card">
+                    <div className="course-info__description">
+                        <h2 className="course-info__subtitle">Description:</h2>
+                        <p>{course.description}</p>
+                    </div>
 
-  const formattedDate = formatCreationDate(resolvedCreationDate);
-  const formattedDuration = getCourseDuration(resolvedDuration);
-  const authorsList = resolvedAuthors.join(", ");
-  const displayId = id || courseFromMocks?.id || "";
-  const handleBack = onBack || (() => {});
+                    <div className="course-info__details">
+                        <p>
+                            <strong>ID:</strong>
+                            <span>{course.id}</span>
+                        </p>
+                        <p>
+                            <strong>Duration:</strong>
+                            <span>{getCourseDuration(course.duration)}</span>
+                        </p>
+                        <p>
+                            <strong>Created:</strong>
+                            <span>
+                                {formatCreationDate(course.creationDate)}
+                            </span>
+                        </p>
+                        <p>
+                            <strong>Authors:</strong>
+                            <span>{authorsNames.join(", ")}</span>
+                        </p>
+                    </div>
+                </div>
 
-  return (
-    <section className="course-info">
-      <h2 className="course-info__title">{resolvedTitle}</h2>
-
-      <div className="course-info__card">
-        <div className="course-info__description-block">
-          <h3 className="course-info__section-title">Description:</h3>
-          <p className="course-info__description">{resolvedDescription}</p>
-        </div>
-
-        <div className="course-info__details">
-          <div className="course-info__row">
-            <span className="course-info__label">ID:</span>
-            <span className="course-info__value course-info__value--mono">{displayId}</span>
-          </div>
-          <div className="course-info__row">
-            <span className="course-info__label">Duration:</span>
-            <span className="course-info__value">{formattedDuration}</span>
-          </div>
-          <div className="course-info__row">
-            <span className="course-info__label">Created:</span>
-            <span className="course-info__value">{formattedDate}</span>
-          </div>
-          <div className="course-info__row">
-            <span className="course-info__label">Authors:</span>
-            <span className="course-info__value">{authorsList}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="course-info__actions">
-        <Link to="/courses">
-          <Button className="course-info__back" buttonText="BACK" onClick={handleBack} />
-        </Link>
-      </div>
-    </section>
-  );
+                <div className="course-info__button">
+                    <Button buttonText={BACK_BUTTON_TEXT} onClick={onBack} />
+                </div>
+            </div>
+        </main>
+    );
 }
+
+export default CourseInfo;

@@ -1,47 +1,25 @@
 import Button from "../../common/Button/Button";
+import { LOGOUT_BUTTON_TEXT, USER_NAME_HARRY } from "../../constants";
 import Logo from "./components/Logo/Logo";
 import "./Header.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
 
-type HeaderProps = {
-  buttonText?: string;
-  userName?: string;
-  onLogout?: () => void;
-};
+type HeaderProps = Readonly<{
+    showUserActions?: boolean;
+}>;
 
-const Header = ({ buttonText = "Logout", userName = "", onLogout = () => {} }: HeaderProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isAuth = useMemo(() => Boolean(localStorage.getItem("token")), []);
-  const displayUserName = userName || localStorage.getItem("user") || "";
-  const displayButtonText = buttonText || "Logout";
-  const hideUserBlock =
-    location.pathname === "/login" || location.pathname === "/registration";
+function Header({ showUserActions = true }: HeaderProps) {
+    return (
+        <header className="header">
+            <Logo />
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("userName");
-    onLogout();
-    navigate("/login");
-  };
-
-  return (
-    <header className="header">
-      <div className="header__inner">
-        <Link to={isAuth ? "/courses" : "/login"}>
-          <Logo />
-        </Link>
-        {!hideUserBlock && isAuth && (
-          <div className="header__actions">
-            {displayUserName && <span className="header__user">{displayUserName}</span>}
-            <Button className="header__button" buttonText={displayButtonText} onClick={handleLogout} />
-          </div>
-        )}
-      </div>
-    </header>
-  );
-};
+            {showUserActions && (
+                <div className="header__actions">
+                    <span className="header__user-name">{USER_NAME_HARRY}</span>
+                    <Button buttonText={LOGOUT_BUTTON_TEXT} />
+                </div>
+            )}
+        </header>
+    );
+}
 
 export default Header;

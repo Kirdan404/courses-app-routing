@@ -1,54 +1,49 @@
 import Button from "../../../../common/Button/Button";
-import getCourseDuration from "../../../../helpers/getCourseDuration";
+import { SHOW_COURSE_BUTTON_TEXT } from "../../../../constants";
 import formatCreationDate from "../../../../helpers/formatCreationDate";
-import { Link } from "react-router-dom";
+import getCourseDuration from "../../../../helpers/getCourseDuration";
+import type { Author, Course } from "../../../../types/course";
 import "./CourseCard.css";
 
-type CourseCardProps = {
-  course: {
-    id: string;
-    title: string;
-    description: string;
-    duration: number | string;
-    creationDate: string;
-    authors: string[];
-  };
-  title: string;
-  description: string;
-  duration: number | string;
-  creationDate: string;
-  authors: string[];
-  allAuthors: { id: string; name: string }[];
-  onShow: () => void;
-};
+type CourseCardProps = Readonly<{
+    course: Course;
+    authorsList: Author[];
+}>;
 
-export default function CourseCard({ course, title, description, duration, creationDate, authors, onShow }: CourseCardProps) {
-  return (
-    <article className="course-card">
-      <div className="course-card__body">
-        <h3 className="course-card__title">{title}</h3>
-        <p className="course-card__description">{description}</p>
-      </div>
+function CourseCard({ course, authorsList }: CourseCardProps) {
+    const authorsNames = course.authors.map((authorId) => {
+        const author = authorsList.find((author) => author.id === authorId);
 
-      <div className="course-card__sidebar">
-        <div className="course-card__meta">
-          <span className="course-card__meta-label">Duration:</span>
-          <span className="course-card__meta-value">{getCourseDuration(duration)}</span>
-        </div>
-        <div className="course-card__meta">
-          <span className="course-card__meta-label">Created:</span>
-          <span className="course-card__meta-value">{formatCreationDate(creationDate)}</span>
-        </div>
-        <div className="course-card__meta">
-          <span className="course-card__meta-label">Authors:</span>
-          <span className="course-card__meta-value course-card__authors">
-            {authors.join(", ")}
-          </span>
-        </div>
-        <Link to={`/courses/${course.id}`}>
-          <Button className="course-card__button" buttonText="Show course" onClick={onShow} />
-        </Link>
-      </div>
-    </article>
-  );
+        return author ? author.name : authorId;
+    });
+
+    return (
+        <article className="course-card">
+            <div className="course-card__content">
+                <h2 className="course-card__title">{course.title}</h2>
+                <p className="course-card__description">{course.description}</p>
+            </div>
+
+            <div className="course-card__info">
+                <p className="course-card__info-row">
+                    <strong>Authors:</strong>
+                    <span className="course-card__authors">
+                        {authorsNames.join(", ")}
+                    </span>
+                </p>
+                <p className="course-card__info-row">
+                    <strong>Duration:</strong>{" "}
+                    {getCourseDuration(course.duration)}
+                </p>
+                <p className="course-card__info-row">
+                    <strong>Created:</strong>{" "}
+                    {formatCreationDate(course.creationDate)}
+                </p>
+
+                <Button buttonText={SHOW_COURSE_BUTTON_TEXT} />
+            </div>
+        </article>
+    );
 }
+
+export default CourseCard;

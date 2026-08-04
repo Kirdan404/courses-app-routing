@@ -1,48 +1,41 @@
 import Button from "../../common/Button/Button";
+import AddIcon from "../../common/Icons/AddIcon";
+import TrashIcon from "../../common/Icons/TrashIcon";
+import type { Author } from "../../types/course";
 import "./AuthorItem.css";
 
-type AuthorItemProps = {
-  name?: string;
-  onAdd?: () => void;
-  onDelete?: () => void;
-  buttonText?: string;
-  onButtonClick?: (id?: string) => void;
-  id?: string;
-};
+type AuthorItemProps = Readonly<{
+    author: Author;
+    buttonText: string;
+    onButtonClick: (authorId: string) => void;
+}>;
 
-export default function AuthorItem({
-  name,
-  onAdd,
-  onDelete,
-  buttonText,
-  onButtonClick,
-  id,
-}: AuthorItemProps) {
-  const displayName = name || "John Doe";
-  const variant = onDelete
-    ? "delete"
-    : onAdd
-    ? "add"
-    : buttonText?.toLowerCase().includes("delete")
-    ? "delete"
-    : "add";
-  const text = buttonText || (variant === "add" ? "Add author" : "Delete author");
-  const handler = onButtonClick || onAdd || onDelete;
-  const identifier = id ?? "1";
+function AuthorItem({ author, buttonText, onButtonClick }: AuthorItemProps) {
+    const isDeleteButton = buttonText.toLowerCase().includes("delete");
 
-  return (
-    <div className="author-item">
-      <span className="author-item__name">{displayName}</span>
-      <div className="author-item__buttons">
-        {handler && (
-          <Button
-            className={`author-item__button author-item__button--${variant}`}
-            buttonText={text}
-            ariaLabel={text}
-            onClick={() => handler(identifier)}
-          />
-        )}
-      </div>
-    </div>
-  );
+    return (
+        <div className="author-item">
+            <span className="author-item__name">{author.name}</span>
+            <div className="author-item__actions">
+                <Button
+                    buttonText={
+                        <>
+                            {isDeleteButton ? (
+                                <TrashIcon className="author-item__delete-icon" />
+                            ) : (
+                                <AddIcon className="author-item__add-icon" />
+                            )}
+                            <span className="author-item__action-text">
+                                {buttonText}
+                            </span>
+                        </>
+                    }
+                    className="author-item__action"
+                    onClick={() => onButtonClick(author.id)}
+                />
+            </div>
+        </div>
+    );
 }
+
+export default AuthorItem;
