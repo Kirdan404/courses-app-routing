@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import "./Registration.css";
@@ -14,6 +15,11 @@ type RegistrationFormErrors = Partial<
     Record<keyof RegistrationFormValues, string>
 >;
 
+type RegistrationResponse = {
+    successful?: boolean;
+    errors?: string[];
+};
+
 const initialFormValues: RegistrationFormValues = {
     name: "",
     email: "",
@@ -21,9 +27,11 @@ const initialFormValues: RegistrationFormValues = {
 };
 
 function Registration() {
+    const navigate = useNavigate();
     const [formValues, setFormValues] =
         useState<RegistrationFormValues>(initialFormValues);
     const [errors, setErrors] = useState<RegistrationFormErrors>({});
+    const [serverError, setServerError] = useState("");
 
     function handleChange(event: ChangeEvent<HTMLInputElement>) {
         const fieldName = event.target.name as keyof RegistrationFormValues;
@@ -42,7 +50,7 @@ function Registration() {
         }
     }
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
         const validationErrors: RegistrationFormErrors = {};
@@ -65,7 +73,31 @@ function Registration() {
             return;
         }
 
-        // Registration request will be implemented when the API is connected.
+        setServerError("");
+
+        try {
+            const response = await fetch("http://localhost:4000/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: formValues.name.trim(),
+                    email: formValues.email.trim(),
+                    password: formValues.password,
+                }),
+            });
+            const result = (await response.json()) as RegistrationResponse;
+
+            if (response.ok || result.successful) {
+                navigate("/login");
+                return;
+            }
+
+            setServerError(result.errors?.join(", ") || "Registration failed.");
+        } catch {
+            setServerError("Unable to connect to the server.");
+        }
     }
 
     return (
@@ -115,8 +147,15 @@ function Registration() {
                     type="submit"
                 />
 
+                {serverError && (
+                    <p className="registration__error" role="alert">
+                        {serverError}
+                    </p>
+                )}
+
                 <p className="registration__login-message">
-                    If you have an account you may <a href="/login">Login</a>
+                    If you have an account you may{" "}
+                    <Link to="/login">Login</Link>
                 </p>
             </form>
         </main>
