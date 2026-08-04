@@ -70,3 +70,15 @@
     justify-content: flex-end;
     margin-top: 45px;
 }
+
+.course-info__back-link {
+    padding: 13px 36px;
+    background-color: #007298;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    text-decoration: none;
+    text-transform: uppercase;
+}

@@ -1,19 +1,27 @@
-import Button from "../../common/Button/Button";
-import { BACK_BUTTON_TEXT } from "../../constants";
+import { Link, Navigate, useParams } from "react-router-dom";
+import {
+    BACK_BUTTON_TEXT,
+    mockedAuthorsList,
+    mockedCoursesList,
+} from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
-import type { Author, Course } from "../../types/course";
 import "./CourseInfo.css";
 
-type CourseInfoProps = Readonly<{
-    course: Course;
-    authorsList: Author[];
-    onBack: () => void;
-}>;
+function CourseInfo() {
+    const { courseId } = useParams<{ courseId: string }>();
+    const course = mockedCoursesList.find(
+        (currentCourse) => currentCourse.id === courseId
+    );
 
-function CourseInfo({ course, authorsList, onBack }: CourseInfoProps) {
+    if (!course) {
+        return <Navigate to="/courses" replace />;
+    }
+
     const authorsNames = course.authors.map((authorId) => {
-        const author = authorsList.find((author) => author.id === authorId);
+        const author = mockedAuthorsList.find(
+            (currentAuthor) => currentAuthor.id === authorId
+        );
 
         return author ? author.name : authorId;
     });
@@ -52,7 +60,9 @@ function CourseInfo({ course, authorsList, onBack }: CourseInfoProps) {
                 </div>
 
                 <div className="course-info__button">
-                    <Button buttonText={BACK_BUTTON_TEXT} onClick={onBack} />
+                    <Link className="course-info__back-link" to="/courses">
+                        {BACK_BUTTON_TEXT}
+                    </Link>
                 </div>
             </div>
         </main>
