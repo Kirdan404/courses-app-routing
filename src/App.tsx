@@ -36,19 +36,32 @@ function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
         Boolean(localStorage.getItem("token"))
     );
+    const [userName, setUserName] = useState(
+        localStorage.getItem("user") ?? ""
+    );
     const [courses, setCourses] = useState<Course[]>(mockedCoursesList);
+
+    function handleLoginSuccess(name: string) {
+        setIsAuthenticated(true);
+        setUserName(name);
+    }
+
+    function handleLogout() {
+        setIsAuthenticated(false);
+        setUserName("");
+    }
 
     return (
         <BrowserRouter>
-            <Header showUserActions={isAuthenticated} />
+            <Header
+                showUserActions={isAuthenticated}
+                userName={userName}
+                onLogout={handleLogout}
+            />
             <Routes>
                 <Route
                     path="/login"
-                    element={
-                        <Login
-                            onLoginSuccess={() => setIsAuthenticated(true)}
-                        />
-                    }
+                    element={<Login onLoginSuccess={handleLoginSuccess} />}
                 />
                 <Route path="/registration" element={<Registration />} />
                 <Route

@@ -16,10 +16,13 @@ type LoginResponse = {
     successful?: boolean;
     result?: string;
     errors?: string[];
+    user?: {
+        name?: string;
+    };
 };
 
 type LoginProps = Readonly<{
-    onLoginSuccess?: () => void;
+    onLoginSuccess?: (userName: string) => void;
 }>;
 
 const initialFormValues: LoginFormValues = {
@@ -86,8 +89,11 @@ function Login({ onLoginSuccess }: LoginProps) {
             const result = (await response.json()) as LoginResponse;
 
             if ((response.ok || result.successful) && result.result) {
+                const userName = result.user?.name ?? "";
+
                 localStorage.setItem("token", result.result);
-                onLoginSuccess?.();
+                localStorage.setItem("user", userName);
+                onLoginSuccess?.(userName);
                 navigate("/courses");
                 return;
             }
