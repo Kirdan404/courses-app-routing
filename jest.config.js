@@ -17,6 +17,7 @@ export default {
     },
 
     transformIgnorePatterns: ["node_modules/(?!(hex-rgb))"],
+    setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
 
     // Indicates which provider should be used to instrument code for coverage
     coverageProvider: "v8",
