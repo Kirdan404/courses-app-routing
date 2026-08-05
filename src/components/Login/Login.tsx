@@ -98,7 +98,7 @@ function Login({ onLoginSuccess }: LoginProps) {
                 return;
             }
 
-            setServerError(result.errors?.join(", ") || "Login failed.");
+            setServerError(result.errors?.join(", ") ?? "Login failed.");
         } catch {
             setServerError("Unable to connect to the server.");
         }

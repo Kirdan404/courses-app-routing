@@ -94,7 +94,7 @@ function Registration() {
                 return;
             }
 
-            setServerError(result.errors?.join(", ") || "Registration failed.");
+            setServerError(result.errors?.join(", ") ?? "Registration failed.");
         } catch {
             setServerError("Unable to connect to the server.");
         }

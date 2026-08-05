@@ -13,7 +13,7 @@ export default {
     transform: {
         "\\.[jt]sx?$": "babel-jest",
         "^.+\\.css$": "jest-transform-css",
-        "^.+\\.svg$": "jest-transform-stub",
+        "^.+\\.(svg|png|jpe?g|gif|webp|avif)$": "jest-transform-stub",
     },
 
     transformIgnorePatterns: ["node_modules/(?!(hex-rgb))"],
