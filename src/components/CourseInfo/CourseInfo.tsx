@@ -1,115 +1,19 @@
 import Button from "../../common/Button/Button";
 import { BACK_BUTTON_TEXT } from "../../constants";
-import { formatCreationDate } from "../../helpers/formatCreationDate";
-import { getCourseDuration } from "../../helpers/getCourseDuration";
+import formatCreationDate from "../../helpers/formatCreationDate";
+import getCourseDuration from "../../helpers/getCourseDuration";
+import type { Author, Course } from "../../types/course";
 import "./CourseInfo.css";
 
-type Course = {
-    id: string;
-    title: string;
-    description: string;
-    creationDate: string;
-    duration: number;
-    authors: string[];
-};
-
-type Author = {
-    id: string;
-    name: string;
-};
-
-const defaultCourse = {
-    id: "1",
-    title: "Course 1",
-    description: "Course 1 description",
-    creationDate: "01/01/2025",
-    duration: 60,
-    authors: ["author2", "author3"],
-};
-
-const defaultAuthorsList = [
-    {
-        id: "27cc3006-e93a-4748-8ca8-73d06aa93b6d",
-        name: "name2",
-    },
-    {
-        id: "f762978b-61eb-4096-812b-ebde22838167",
-        name: "name3",
-    },
-    {
-        id: "author2",
-        name: "name2",
-    },
-    {
-        id: "author3",
-        name: "name3",
-    },
-];
-
 type CourseInfoProps = Readonly<{
-    id?: string;
-    title?: string;
-    description?: string;
-    creationDate?: string;
-    duration?: number;
-    authors?: string[];
-    course?: Course;
-    courseInfo?: Course;
-    courseData?: Course;
-    selectedCourse?: Course;
-    currentCourse?: Course;
-    courseDetails?: Course;
-    courseItem?: Course;
-    authorsList?: Author[];
-    allAuthors?: Author[];
-    mockedAuthorsList?: Author[];
-    authorsData?: Author[];
+    course: Course;
+    authorsList: Author[];
+    onBack: () => void;
 }>;
 
-function CourseInfo({
-    id,
-    title,
-    description,
-    creationDate,
-    duration,
-    authors,
-    course,
-    courseInfo,
-    courseData,
-    selectedCourse,
-    currentCourse: currentCourseProp,
-    courseDetails,
-    courseItem,
-    authorsList,
-    allAuthors,
-    mockedAuthorsList,
-    authorsData,
-}: CourseInfoProps) {
-    const hasCourseFields =
-        id && title && description && creationDate && duration !== undefined && authors;
-    const courseFromProps = {
-        id: id ?? "",
-        title: title ?? "",
-        description: description ?? "",
-        creationDate: creationDate ?? "",
-        duration: duration ?? 0,
-        authors: authors ?? [],
-    };
-
-    const currentCourse =
-        course ||
-        courseInfo ||
-        courseData ||
-        selectedCourse ||
-        currentCourseProp ||
-        courseDetails ||
-        courseItem ||
-        (hasCourseFields ? courseFromProps : defaultCourse);
-    const currentAuthorsList =
-        authorsList ?? allAuthors ?? mockedAuthorsList ?? authorsData ?? defaultAuthorsList;
-
-    const authorsNames = currentCourse.authors.map((authorId) => {
-        const author = currentAuthorsList.find((author) => author.id === authorId);
+function CourseInfo({ course, authorsList, onBack }: CourseInfoProps) {
+    const authorsNames = course.authors.map((authorId) => {
+        const author = authorsList.find((author) => author.id === authorId);
 
         return author ? author.name : authorId;
     });
@@ -117,26 +21,28 @@ function CourseInfo({
     return (
         <main className="course-info">
             <div className="course-info__content">
-                <h1 className="course-info__title">{currentCourse.title}</h1>
+                <h1 className="course-info__title">{course.title}</h1>
 
                 <div className="course-info__card">
                     <div className="course-info__description">
                         <h2 className="course-info__subtitle">Description:</h2>
-                        <p>{currentCourse.description}</p>
+                        <p>{course.description}</p>
                     </div>
 
                     <div className="course-info__details">
                         <p>
                             <strong>ID:</strong>
-                            <span>{currentCourse.id}</span>
+                            <span>{course.id}</span>
                         </p>
                         <p>
                             <strong>Duration:</strong>
-                            <span>{getCourseDuration(currentCourse.duration)}</span>
+                            <span>{getCourseDuration(course.duration)}</span>
                         </p>
                         <p>
                             <strong>Created:</strong>
-                            <span>{formatCreationDate(currentCourse.creationDate)}</span>
+                            <span>
+                                {formatCreationDate(course.creationDate)}
+                            </span>
                         </p>
                         <p>
                             <strong>Authors:</strong>
@@ -146,7 +52,7 @@ function CourseInfo({
                 </div>
 
                 <div className="course-info__button">
-                    <Button buttonText={BACK_BUTTON_TEXT} />
+                    <Button buttonText={BACK_BUTTON_TEXT} onClick={onBack} />
                 </div>
             </div>
         </main>
