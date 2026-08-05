@@ -10,19 +10,22 @@ type HeaderProps = Readonly<{
     onLogout?: () => void;
 }>;
 
-function Header({
-    showUserActions = true,
-    userName = "",
-    onLogout,
-}: HeaderProps) {
+function Header({ showUserActions = true, userName, onLogout }: HeaderProps) {
     const location = useLocation();
     const navigate = useNavigate();
+    const token = localStorage.getItem("token");
+    const displayedUserName =
+        userName ??
+        localStorage.getItem("user") ??
+        localStorage.getItem("userName") ??
+        "";
     const isAuthenticationPage =
         location.pathname === "/login" || location.pathname === "/registration";
 
     function handleLogout() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        localStorage.removeItem("userName");
         onLogout?.();
         navigate("/login");
     }
@@ -31,9 +34,11 @@ function Header({
         <header className="header">
             <Logo />
 
-            {showUserActions && !isAuthenticationPage && (
+            {showUserActions && token && !isAuthenticationPage && (
                 <div className="header__actions">
-                    <span className="header__user-name">{userName}</span>
+                    <span className="header__user-name">
+                        {displayedUserName}
+                    </span>
                     <Button
                         buttonText={LOGOUT_BUTTON_TEXT}
                         onClick={handleLogout}
