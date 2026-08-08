@@ -61,9 +61,24 @@ function App() {
             <Routes>
                 <Route
                     path={ROUTES.LOGIN}
-                    element={<Login onLoginSuccess={handleLoginSuccess} />}
+                    element={
+                        isAuthenticated ? (
+                            <Navigate to={ROUTES.COURSES} replace />
+                        ) : (
+                            <Login onLoginSuccess={handleLoginSuccess} />
+                        )
+                    }
                 />
-                <Route path={ROUTES.REGISTRATION} element={<Registration />} />
+                <Route
+                    path={ROUTES.REGISTRATION}
+                    element={
+                        isAuthenticated ? (
+                            <Navigate to={ROUTES.COURSES} replace />
+                        ) : (
+                            <Registration />
+                        )
+                    }
+                />
                 <Route
                     path={ROUTES.COURSES}
                     element={
