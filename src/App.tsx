@@ -14,7 +14,7 @@ import CreateCourse from "./components/CreateCourse/CreateCourse";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
-import { mockedCoursesList } from "./constants";
+import { mockedCoursesList, STORAGE_KEYS } from "./constants";
 import type { Course } from "./types/course";
 
 type CreateCoursePageProps = Readonly<{
@@ -34,10 +34,10 @@ function CreateCoursePage({ setCourses }: CreateCoursePageProps) {
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
-        Boolean(localStorage.getItem("token"))
+        Boolean(localStorage.getItem(STORAGE_KEYS.TOKEN))
     );
     const [userName, setUserName] = useState(
-        localStorage.getItem("user") ?? ""
+        localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? ""
     );
     const [courses, setCourses] = useState<Course[]>(mockedCoursesList);
 

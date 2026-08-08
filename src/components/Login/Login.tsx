@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
+import { STORAGE_KEYS } from "../../constants";
 import "./Login.css";
 
 type LoginFormValues = {
@@ -91,8 +92,8 @@ function Login({ onLoginSuccess }: LoginProps) {
             if ((response.ok || result.successful) && result.result) {
                 const userName = result.user?.name ?? "";
 
-                localStorage.setItem("token", result.result);
-                localStorage.setItem("user", userName);
+                localStorage.setItem(STORAGE_KEYS.TOKEN, result.result);
+                localStorage.setItem(STORAGE_KEYS.USER_NAME, userName);
                 onLoginSuccess?.(userName);
                 navigate("/courses");
                 return;
