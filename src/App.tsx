@@ -1,5 +1,4 @@
-import { useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
+import { useEffect } from "react";
 import {
     BrowserRouter,
     Navigate,
@@ -14,65 +13,58 @@ import CreateCourse from "./components/CreateCourse/CreateCourse";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
-import { mockedCoursesList, ROUTES, STORAGE_KEYS } from "./constants";
-import type { Course } from "./types/course";
+import { ROUTES, STORAGE_KEYS } from "./constants";
+import { fetchAuthors } from "./store/authors/authorsSlice";
+import { fetchCourses } from "./store/courses/coursesSlice";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { selectUser } from "./store/selectors";
+import { logout } from "./store/user/userSlice";
 
-type CreateCoursePageProps = Readonly<{
-    setCourses: Dispatch<SetStateAction<Course[]>>;
-}>;
-
-function CreateCoursePage({ setCourses }: CreateCoursePageProps) {
+function CreateCoursePage() {
     const navigate = useNavigate();
 
-    return (
-        <CreateCourse
-            changeMode={() => navigate(ROUTES.COURSES)}
-            setCourses={setCourses}
-        />
-    );
+    return <CreateCourse changeMode={() => navigate(ROUTES.COURSES)} />;
 }
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(
-        Boolean(localStorage.getItem(STORAGE_KEYS.TOKEN))
-    );
-    const [userName, setUserName] = useState(
-        localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? ""
-    );
-    const [courses, setCourses] = useState<Course[]>(mockedCoursesList);
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(selectUser);
 
-    function handleLoginSuccess(name: string) {
-        setIsAuthenticated(true);
-        setUserName(name);
-    }
+    useEffect(() => {
+        if (user.isAuth) {
+            void dispatch(fetchCourses());
+            void dispatch(fetchAuthors());
+        }
+    }, [dispatch, user.isAuth]);
 
     function handleLogout() {
-        setIsAuthenticated(false);
-        setUserName("");
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER_NAME);
+        dispatch(logout());
     }
 
     return (
         <BrowserRouter>
             <Header
-                showUserActions={isAuthenticated}
-                userName={userName}
+                showUserActions={user.isAuth}
+                userName={user.name}
                 onLogout={handleLogout}
             />
             <Routes>
                 <Route
                     path={ROUTES.LOGIN}
                     element={
-                        isAuthenticated ? (
+                        user.isAuth ? (
                             <Navigate to={ROUTES.COURSES} replace />
                         ) : (
-                            <Login onLoginSuccess={handleLoginSuccess} />
+                            <Login />
                         )
                     }
                 />
                 <Route
                     path={ROUTES.REGISTRATION}
                     element={
-                        isAuthenticated ? (
+                        user.isAuth ? (
                             <Navigate to={ROUTES.COURSES} replace />
                         ) : (
                             <Registration />
@@ -83,7 +75,7 @@ function App() {
                     path={ROUTES.COURSES}
                     element={
                         <PrivateRoute>
-                            <Courses courses={courses} />
+                            <Courses />
                         </PrivateRoute>
                     }
                 />
@@ -91,7 +83,7 @@ function App() {
                     path={ROUTES.CREATE_COURSE}
                     element={
                         <PrivateRoute>
-                            <CreateCoursePage setCourses={setCourses} />
+                            <CreateCoursePage />
                         </PrivateRoute>
                     }
                 />
@@ -99,7 +91,7 @@ function App() {
                     path={ROUTES.COURSE_INFO}
                     element={
                         <PrivateRoute>
-                            <CourseInfo courses={courses} />
+                            <CourseInfo />
                         </PrivateRoute>
                     }
                 />

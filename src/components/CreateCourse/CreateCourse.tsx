@@ -3,9 +3,12 @@ import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import Textarea from "../../common/Textarea/Textarea";
-import { mockedAuthorsList } from "../../constants";
 import getCourseDuration from "../../helpers/getCourseDuration";
-import type { Author, Course } from "../../types/course";
+import { addAuthor } from "../../store/authors/authorsSlice";
+import { addCourse } from "../../store/courses/coursesSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectAuthors } from "../../store/selectors";
+import type { Course } from "../../types/course";
 import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CreateCourse.css";
 
@@ -44,11 +47,12 @@ function getCurrentDate() {
 }
 
 function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
+    const dispatch = useAppDispatch();
+    const authorsList = useAppSelector(selectAuthors);
     const [formValues, setFormValues] =
         useState<CourseFormValues>(initialFormValues);
     const [errors, setErrors] = useState<CourseFormErrors>({});
     const [courseAuthorIds, setCourseAuthorIds] = useState<string[]>([]);
-    const [authorsList, setAuthorsList] = useState<Author[]>(mockedAuthorsList);
 
     const availableAuthors = authorsList.filter(
         (author) => !courseAuthorIds.includes(author.id)
@@ -105,13 +109,12 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
             return;
         }
 
-        setAuthorsList((currentAuthors) => [
-            ...currentAuthors,
-            {
+        dispatch(
+            addAuthor({
                 id: generateId(),
                 name: trimmedAuthorName,
-            },
-        ]);
+            })
+        );
         updateField("authorName", "");
     }
 
@@ -173,6 +176,7 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
         setFormValues({ ...initialFormValues });
         setCourseAuthorIds([]);
         setErrors({});
+        dispatch(addCourse(newCourse));
         setCourses?.((currentCourses) => [...currentCourses, newCourse]);
         changeMode?.();
     }

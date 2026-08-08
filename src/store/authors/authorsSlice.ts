@@ -1,10 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAuthors } from "../../services/services";
-
-export type Author = {
-    id: string;
-    name: string;
-};
+import type { Author } from "../../types/course";
 
 type AuthorsState = Author[];
 

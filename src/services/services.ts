@@ -1,22 +1,24 @@
-import { Author } from "../store/authors/authorsSlice";
-import { Course } from "../store/courses/coursesSlice";
+import { API_BASE_URL } from "../constants";
+import type { Author, Course } from "../types/course";
 
-const API_BASE = "http://localhost:4000";
+type ApiResponse<T> = {
+    result?: T;
+};
 
 export const getCourses = async (): Promise<Course[]> => {
-    const response = await fetch(`${API_BASE}/courses/all`);
-    const data = await response.json();
+    const response = await fetch(`${API_BASE_URL}/courses/all`);
+    const data = (await response.json()) as ApiResponse<Course[]>;
     if (!response.ok) {
-        throw new Error(data?.result || "Failed to fetch courses");
+        throw new Error("Failed to fetch courses");
     }
-    return data?.result || [];
+    return data.result ?? [];
 };
 
 export const getAuthors = async (): Promise<Author[]> => {
-    const response = await fetch(`${API_BASE}/authors/all`);
-    const data = await response.json();
+    const response = await fetch(`${API_BASE_URL}/authors/all`);
+    const data = (await response.json()) as ApiResponse<Author[]>;
     if (!response.ok) {
-        throw new Error(data?.result || "Failed to fetch authors");
+        throw new Error("Failed to fetch authors");
     }
-    return data?.result || [];
+    return data.result ?? [];
 };

@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import { API_BASE_URL, ROUTES, STORAGE_KEYS } from "../../constants";
+import { useAppDispatch } from "../../store/hooks";
+import { login } from "../../store/user/userSlice";
 import "./Login.css";
 
 type LoginFormValues = {
@@ -33,6 +35,7 @@ const initialFormValues: LoginFormValues = {
 
 function Login({ onLoginSuccess }: LoginProps) {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const [formValues, setFormValues] =
         useState<LoginFormValues>(initialFormValues);
     const [errors, setErrors] = useState<LoginFormErrors>({});
@@ -94,6 +97,13 @@ function Login({ onLoginSuccess }: LoginProps) {
 
                 localStorage.setItem(STORAGE_KEYS.TOKEN, result.result);
                 localStorage.setItem(STORAGE_KEYS.USER_NAME, userName);
+                dispatch(
+                    login({
+                        name: userName,
+                        email: formValues.email.trim(),
+                        token: result.result,
+                    })
+                );
                 onLoginSuccess?.(userName);
                 navigate(ROUTES.COURSES);
                 return;

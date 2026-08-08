@@ -1,14 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getCourses } from "../../services/services";
-
-export type Course = {
-    id: string;
-    title: string;
-    description: string;
-    creationDate: string;
-    duration: number;
-    authors: string[];
-};
+import type { Course } from "../../types/course";
 
 type CoursesState = Course[];
 

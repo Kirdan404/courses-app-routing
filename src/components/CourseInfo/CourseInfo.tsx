@@ -1,25 +1,15 @@
 import { Link, Navigate, useParams } from "react-router-dom";
-import {
-    BACK_BUTTON_TEXT,
-    mockedAuthorsList,
-    mockedCoursesList,
-    ROUTES,
-} from "../../constants";
+import { BACK_BUTTON_TEXT, ROUTES } from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
-import type { Author, Course } from "../../types/course";
+import { useAppSelector } from "../../store/hooks";
+import { selectAuthors, selectCourses } from "../../store/selectors";
 import "./CourseInfo.css";
 
-type CourseInfoProps = Readonly<{
-    courses?: Course[];
-    authorsList?: Author[];
-}>;
-
-function CourseInfo({
-    courses = mockedCoursesList,
-    authorsList = mockedAuthorsList,
-}: CourseInfoProps) {
+function CourseInfo() {
     const { courseId } = useParams<{ courseId: string }>();
+    const courses = useAppSelector(selectCourses);
+    const authors = useAppSelector(selectAuthors);
     const course = courses.find(
         (currentCourse) => currentCourse.id === courseId
     );
@@ -29,7 +19,7 @@ function CourseInfo({
     }
 
     const authorsNames = course.authors.map((authorId) => {
-        const author = authorsList.find(
+        const author = authors.find(
             (currentAuthor) => currentAuthor.id === authorId
         );
 
