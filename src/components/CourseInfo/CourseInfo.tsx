@@ -3,6 +3,7 @@ import {
     BACK_BUTTON_TEXT,
     mockedAuthorsList,
     mockedCoursesList,
+    ROUTES,
 } from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
@@ -24,7 +25,7 @@ function CourseInfo({
     );
 
     if (!course) {
-        return <Navigate to="/courses" replace />;
+        return <Navigate to={ROUTES.COURSES} replace />;
     }
 
     const authorsNames = course.authors.map((authorId) => {
@@ -69,7 +70,10 @@ function CourseInfo({
                 </div>
 
                 <div className="course-info__button">
-                    <Link className="course-info__back-link" to="/courses">
+                    <Link
+                        className="course-info__back-link"
+                        to={ROUTES.COURSES}
+                    >
                         {BACK_BUTTON_TEXT}
                     </Link>
                 </div>

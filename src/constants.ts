@@ -1,7 +1,20 @@
 import type { Author, Course } from "./types/course";
 
-export const USER_NAME_HARRY = "Harry Potter";
+export const API_BASE_URL = "http://localhost:4000";
 export const LOGOUT_BUTTON_TEXT = "Logout";
+export const STORAGE_KEYS = {
+    TOKEN: "token",
+    USER_NAME: "userName",
+} as const;
+export const ROUTES = {
+    HOME: "/",
+    LOGIN: "/login",
+    REGISTRATION: "/registration",
+    COURSES: "/courses",
+    CREATE_COURSE: "/courses/add",
+    COURSE_INFO: "/courses/:courseId",
+    NOT_FOUND: "*",
+} as const;
 export const SHOW_COURSE_BUTTON_TEXT = "Show course";
 export const ADD_NEW_COURSE_BUTTON_TEXT = "Add new course";
 export const BACK_BUTTON_TEXT = "Back";

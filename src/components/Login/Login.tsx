@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
+import { API_BASE_URL, ROUTES, STORAGE_KEYS } from "../../constants";
 import "./Login.css";
 
 type LoginFormValues = {
@@ -76,7 +77,7 @@ function Login({ onLoginSuccess }: LoginProps) {
         setServerError("");
 
         try {
-            const response = await fetch("http://localhost:4000/login", {
+            const response = await fetch(`${API_BASE_URL}/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -91,10 +92,10 @@ function Login({ onLoginSuccess }: LoginProps) {
             if ((response.ok || result.successful) && result.result) {
                 const userName = result.user?.name ?? "";
 
-                localStorage.setItem("token", result.result);
-                localStorage.setItem("user", userName);
+                localStorage.setItem(STORAGE_KEYS.TOKEN, result.result);
+                localStorage.setItem(STORAGE_KEYS.USER_NAME, userName);
                 onLoginSuccess?.(userName);
-                navigate("/courses");
+                navigate(ROUTES.COURSES);
                 return;
             }
 
@@ -146,7 +147,7 @@ function Login({ onLoginSuccess }: LoginProps) {
 
                 <p className="login__registration-message">
                     If you don&apos;t have an account you may{" "}
-                    <Link to="/registration">Registration</Link>
+                    <Link to={ROUTES.REGISTRATION}>Registration</Link>
                 </p>
             </form>
         </main>

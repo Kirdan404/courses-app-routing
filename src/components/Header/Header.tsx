@@ -1,6 +1,6 @@
 import Button from "../../common/Button/Button";
 import { useLocation, useNavigate } from "react-router-dom";
-import { LOGOUT_BUTTON_TEXT } from "../../constants";
+import { LOGOUT_BUTTON_TEXT, ROUTES, STORAGE_KEYS } from "../../constants";
 import Logo from "./components/Logo/Logo";
 import "./Header.css";
 
@@ -13,21 +13,18 @@ type HeaderProps = Readonly<{
 function Header({ showUserActions = true, userName, onLogout }: HeaderProps) {
     const location = useLocation();
     const navigate = useNavigate();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
     const displayedUserName =
-        userName ??
-        localStorage.getItem("user") ??
-        localStorage.getItem("userName") ??
-        "";
+        userName ?? localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
     const isAuthenticationPage =
-        location.pathname === "/login" || location.pathname === "/registration";
+        location.pathname === ROUTES.LOGIN ||
+        location.pathname === ROUTES.REGISTRATION;
 
     function handleLogout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("userName");
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER_NAME);
         onLogout?.();
-        navigate("/login");
+        navigate(ROUTES.LOGIN);
     }
 
     return (
