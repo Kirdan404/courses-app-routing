@@ -3,7 +3,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
-import { ROUTES, STORAGE_KEYS } from "../../constants";
+import { API_BASE_URL, ROUTES, STORAGE_KEYS } from "../../constants";
 import "./Login.css";
 
 type LoginFormValues = {
@@ -77,7 +77,7 @@ function Login({ onLoginSuccess }: LoginProps) {
         setServerError("");
 
         try {
-            const response = await fetch("http://localhost:4000/login", {
+            const response = await fetch(`${API_BASE_URL}/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

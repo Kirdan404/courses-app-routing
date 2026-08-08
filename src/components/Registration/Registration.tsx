@@ -3,7 +3,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
-import { ROUTES } from "../../constants";
+import { API_BASE_URL, ROUTES } from "../../constants";
 import "./Registration.css";
 
 type RegistrationFormValues = {
@@ -77,7 +77,7 @@ function Registration() {
         setServerError("");
 
         try {
-            const response = await fetch("http://localhost:4000/register", {
+            const response = await fetch(`${API_BASE_URL}/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
