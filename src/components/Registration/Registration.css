@@ -38,6 +38,14 @@
     margin-top: 14px;
 }
 
+.registration__error {
+    margin: 12px 0 0;
+    color: #ff0000;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+}
+
 .registration__login-message {
     margin: 38px 0 0;
     font-size: 16px;

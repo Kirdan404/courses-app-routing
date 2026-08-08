@@ -1,19 +1,22 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import {
     ADD_NEW_COURSE_BUTTON_TEXT,
     mockedAuthorsList,
     mockedCoursesList,
 } from "../../constants";
-import CreateCourse from "../CreateCourse/CreateCourse";
+import type { Course } from "../../types/course";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
 
-function Courses() {
-    const [courses, setCourses] = useState(mockedCoursesList);
-    const [isCreateCourseMode, setIsCreateCourseMode] =
-        useState<boolean>(false);
+type CoursesProps = Readonly<{
+    courses?: Course[];
+}>;
+
+function Courses({ courses = mockedCoursesList }: CoursesProps) {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
 
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
@@ -27,14 +30,6 @@ function Courses() {
         );
     });
 
-    const changeMode = () => {
-        setIsCreateCourseMode(!isCreateCourseMode);
-    };
-
-    if (isCreateCourseMode) {
-        return <CreateCourse changeMode={changeMode} setCourses={setCourses} />;
-    }
-
     return (
         <main className="courses">
             <div className="courses__content">
@@ -42,7 +37,7 @@ function Courses() {
                     <SearchBar onSearch={setSearchQuery} />
                     <Button
                         buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
-                        onClick={changeMode}
+                        onClick={() => navigate("/courses/add")}
                     />
                 </div>
 
@@ -52,6 +47,9 @@ function Courses() {
                             key={course.id}
                             course={course}
                             authorsList={mockedAuthorsList}
+                            onShowCourse={(courseId) =>
+                                navigate(`/courses/${courseId}`)
+                            }
                         />
                     ))}
                 </div>
