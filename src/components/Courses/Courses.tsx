@@ -1,73 +1,45 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
+import {
+    ADD_NEW_COURSE_BUTTON_TEXT,
+    mockedAuthorsList,
+    mockedCoursesList,
+    ROUTES,
+} from "../../constants";
+import type { Course } from "../../types/course";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchAuthors } from "../../store/authors/authorsSlice";
-import { fetchCourses } from "../../store/courses/coursesSlice";
-import { selectAuthors, selectCourses } from "../../store/selectors";
 
-type CoursesProps = {
-    onShowCourse?: (courseId: string) => void;
-    onAddCourseClick?: () => void;
-};
+type CoursesProps = Readonly<{
+    courses?: Course[];
+}>;
 
-const Courses = ({ onShowCourse = () => {}, onAddCourseClick }: CoursesProps) => {
-    const dispatch = useAppDispatch();
-    const courses = useAppSelector(selectCourses);
-    const authors = useAppSelector(selectAuthors);
+function Courses({ courses = mockedCoursesList }: CoursesProps) {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        if (!courses.length) {
-            dispatch(fetchCourses());
-        }
-        if (!authors.length) {
-            dispatch(fetchAuthors());
-        }
-    }, [dispatch, courses.length, authors.length]);
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+    const filteredCourses = courses.filter((course) => {
+        const title = course.title.toLowerCase();
+        const id = course.id.toLowerCase();
 
-    const authorsDictionary = useMemo(() => {
-        const dictionary: Record<string, string> = {};
-
-        authors.forEach((author) => {
-            dictionary[author.id] = author.name;
-        });
-
-        return dictionary;
-    }, [authors]);
-
-    const resolveAuthorNames = (authorIds: string[]) =>
-        authorIds
-            .map((authorId) => authorsDictionary[authorId])
-            .filter((name): name is string => Boolean(name));
-
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-
-    const filteredCourses = useMemo(() => {
-        if (!normalizedQuery) return courses;
-
-        return courses.filter((course) => {
-            const titleMatch = course.title.toLowerCase().includes(normalizedQuery);
-            const idMatch = course.id.toLowerCase().includes(normalizedQuery);
-            return titleMatch || idMatch;
-        });
-    }, [courses, normalizedQuery]);
+        return (
+            title.includes(normalizedSearchQuery) ||
+            id.includes(normalizedSearchQuery)
+        );
+    });
 
     return (
-        <section className="courses">
+        <main className="courses">
             <div className="courses__content">
-                <div className="courses__toolbar">
+                <div className="courses__top-bar">
                     <SearchBar onSearch={setSearchQuery} />
-                    <Link to="/courses/add">
-                        <Button
-                            className="courses__add-button"
-                            buttonText="Create course"
-                            onClick={onAddCourseClick || (() => {})}
-                        />
-                    </Link>
+                    <Button
+                        buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
+                        onClick={() => navigate(ROUTES.CREATE_COURSE)}
+                    />
                 </div>
 
                 <div className="courses__list">
@@ -75,19 +47,21 @@ const Courses = ({ onShowCourse = () => {}, onAddCourseClick }: CoursesProps) =>
                         <CourseCard
                             key={course.id}
                             course={course}
-                            title={course.title}
-                            description={course.description}
-                            duration={course.duration}
-                            creationDate={course.creationDate}
-                            authors={resolveAuthorNames(course.authors)}
-                            allAuthors={authors}
-                            onShow={() => onShowCourse(course.id)}
+                            authorsList={mockedAuthorsList}
+                            onShowCourse={(courseId) =>
+                                navigate(
+                                    ROUTES.COURSE_INFO.replace(
+                                        ":courseId",
+                                        courseId
+                                    )
+                                )
+                            }
                         />
                     ))}
                 </div>
             </div>
-        </section>
+        </main>
     );
-};
+}
 
 export default Courses;

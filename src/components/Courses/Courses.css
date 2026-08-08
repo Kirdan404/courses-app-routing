@@ -1,34 +1,23 @@
 .courses {
-    background: #f5f6f8;
-    padding: 64px 0 96px;
+    min-height: calc(100vh - 80px);
+    padding: 75px 0;
+    background-color: #f7f7f7;
 }
 
 .courses__content {
-    width: 100%;
     max-width: 1122px;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
 }
 
-.courses__toolbar {
+.courses__top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-}
-
-.courses__add-button {
-    width: 233px;
-    height: 50px;
-    flex-shrink: 0;
+    margin-bottom: 30px;
 }
 
 .courses__list {
     display: flex;
     flex-direction: column;
-    gap: 32px;
-    width: 100%;
+    gap: 30px;
 }

@@ -4,11 +4,11 @@ import coursesReducer from "./courses/coursesSlice";
 import userReducer from "./user/userSlice";
 
 export const store = configureStore({
-  reducer: {
-    user: userReducer,
-    courses: coursesReducer,
-    authors: authorsReducer,
-  },
+    reducer: {
+        user: userReducer,
+        courses: coursesReducer,
+        authors: authorsReducer,
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

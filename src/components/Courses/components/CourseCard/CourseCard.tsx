@@ -1,76 +1,53 @@
 import Button from "../../../../common/Button/Button";
-import getCourseDuration from "../../../../helpers/getCourseDuration";
+import { SHOW_COURSE_BUTTON_TEXT } from "../../../../constants";
 import formatCreationDate from "../../../../helpers/formatCreationDate";
-import { Link } from "react-router-dom";
+import getCourseDuration from "../../../../helpers/getCourseDuration";
+import type { Author, Course } from "../../../../types/course";
 import "./CourseCard.css";
-import { useAppDispatch } from "../../../../store/hooks";
-import { removeCourse } from "../../../../store/courses/coursesSlice";
 
-type CourseCardProps = {
-  course: {
-    id: string;
-    title: string;
-    description: string;
-    duration: number | string;
-    creationDate: string;
-    authors: string[];
-  };
-  title: string;
-  description: string;
-  duration: number | string;
-  creationDate: string;
-  authors: string[];
-  allAuthors: { id: string; name: string }[];
-  onShow: () => void;
-};
+type CourseCardProps = Readonly<{
+    course: Course;
+    authorsList: Author[];
+    onShowCourse?: (courseId: string) => void;
+}>;
 
-export default function CourseCard({ course, title, description, duration, creationDate, authors, onShow }: CourseCardProps) {
-  const dispatch = useAppDispatch();
+function CourseCard({ course, authorsList, onShowCourse }: CourseCardProps) {
+    const authorsNames = course.authors.map((authorId) => {
+        const author = authorsList.find((author) => author.id === authorId);
 
-  const handleDelete = () => {
-    dispatch(removeCourse(course.id));
-  };
+        return author ? author.name : authorId;
+    });
 
-  return (
-    <article className="course-card">
-      <div className="course-card__body">
-        <h3 className="course-card__title">{title}</h3>
-        <p className="course-card__description">{description}</p>
-      </div>
+    return (
+        <article className="course-card">
+            <div className="course-card__content">
+                <h2 className="course-card__title">{course.title}</h2>
+                <p className="course-card__description">{course.description}</p>
+            </div>
 
-      <div className="course-card__sidebar">
-        <div className="course-card__meta">
-          <span className="course-card__meta-label">Authors:</span>
-          <span className="course-card__meta-value course-card__authors">
-            {authors.join(", ")}
-          </span>
-        </div>
-        <div className="course-card__meta">
-          <span className="course-card__meta-label">Duration:</span>
-          <span className="course-card__meta-value">{getCourseDuration(duration)}</span>
-        </div>
-        <div className="course-card__meta">
-          <span className="course-card__meta-label">Created:</span>
-          <span className="course-card__meta-value">{formatCreationDate(creationDate)}</span>
-        </div>
+            <div className="course-card__info">
+                <p className="course-card__info-row">
+                    <strong>Authors:</strong>
+                    <span className="course-card__authors">
+                        {authorsNames.join(", ")}
+                    </span>
+                </p>
+                <p className="course-card__info-row">
+                    <strong>Duration:</strong>{" "}
+                    {getCourseDuration(course.duration)}
+                </p>
+                <p className="course-card__info-row">
+                    <strong>Created:</strong>{" "}
+                    {formatCreationDate(course.creationDate)}
+                </p>
 
-        <div className="course-card__buttons">
-          <Link to={`/courses/${course.id}`}>
-            <Button 
-              className="course-card__button-show" 
-              buttonText="Show course" 
-              onClick={onShow} />
-          </Link>
-          <Button 
-            className="course-card__button-delete" 
-            buttonText="" 
-            onClick={handleDelete} />
-          <Button 
-          className="course-card__button-edit" 
-          buttonText="" 
-          onClick={() => {}} />
-        </div>
-      </div>
-    </article>
-  );
+                <Button
+                    buttonText={SHOW_COURSE_BUTTON_TEXT}
+                    onClick={() => onShowCourse?.(course.id)}
+                />
+            </div>
+        </article>
+    );
 }
+
+export default CourseCard;

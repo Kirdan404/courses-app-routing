@@ -1,46 +1,46 @@
-import { ChangeEvent, KeyboardEvent, useState } from "react";
-import "./SearchBar.css";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
 import Button from "../../../../common/Button/Button";
+import Input from "../../../../common/Input/Input";
+import {
+    SEARCH_BUTTON_TEXT,
+    SEARCH_INPUT_PLACEHOLDER,
+} from "../../../../constants";
 import "./SearchBar.css";
 
-type SearchBarProps = {
-    onSearch?: (value: string) => void;
-};
+type SearchBarProps = Readonly<{
+    onSearch: (searchQuery: string) => void;
+}>;
 
-const SearchBar = ({ onSearch }: SearchBarProps) => {
-    const [value, setValue] = useState("");
+function SearchBar({ onSearch }: SearchBarProps) {
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const handleSearch = () => onSearch?.(value);
+    function handleChange(event: ChangeEvent<HTMLInputElement>) {
+        const { value } = event.target;
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const nextValue = event.target.value;
-        setValue(nextValue);
-        if (nextValue === "") {
-            onSearch?.("");
+        setSearchQuery(value);
+
+        if (!value) {
+            onSearch("");
         }
-    };
+    }
 
     return (
         <div className="search-bar">
-            <input
+            <Input
                 className="search-bar__input"
-                type="text"
-                placeholder="Input text"
-                value={value}
-                onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
-                    if (event.key === "Enter") {
-                        handleSearch();
-                    }
-                }}
+                hideLabel
+                labelText="Search courses"
+                placeholderText={SEARCH_INPUT_PLACEHOLDER}
+                value={searchQuery}
                 onChange={handleChange}
             />
             <Button
-                className="search-bar__button"
-                buttonText="Search"
-                onClick={handleSearch}
+                buttonText={SEARCH_BUTTON_TEXT}
+                onClick={() => onSearch(searchQuery)}
             />
         </div>
     );
-};
+}
 
 export default SearchBar;

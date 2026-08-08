@@ -1,339 +1,295 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-
+import { useState } from "react";
+import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
+import Textarea from "../../common/Textarea/Textarea";
+import { mockedAuthorsList } from "../../constants";
+import getCourseDuration from "../../helpers/getCourseDuration";
+import type { Author, Course } from "../../types/course";
 import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CreateCourse.css";
-import getCourseDuration from "../../helpers/getCourseDuration";
-import { useAppDispatch } from "../../store/hooks";
-import { addAuthor as addAuthorAction } from "../../store/authors/authorsSlice";
-import { addCourse as addCourseAction } from "../../store/courses/coursesSlice";
 
-type CreateCourseFormState = {
-  title: string;
-  description: string;
-  duration: string;
+type CreateCourseProps = Readonly<{
+    changeMode?: () => void;
+    setCourses?: Dispatch<SetStateAction<Course[]>>;
+}>;
+
+type CourseFormValues = {
+    title: string;
+    description: string;
+    duration: string;
+    authorName: string;
 };
 
-type Author = {
-  id: string;
-  name: string;
+type CourseFormErrors = Partial<Record<keyof CourseFormValues, string>>;
+
+const initialFormValues: CourseFormValues = {
+    title: "",
+    description: "",
+    duration: "",
+    authorName: "",
 };
 
-type Course = {
-  id: string;
-  title: string;
-  description: string;
-  creationDate: string;
-  duration: number;
-  authors: string[];
-};
-
-type CreateCourseProps = {
-  authors?: Author[];
-  onAddAuthor?: (author: Author) => void;
-  onAddCourse?: (course: Course) => void;
-  onCancel?: () => void;
-};
-
-const initialFormState: CreateCourseFormState = {
-  title: "",
-  description: "",
-  duration: "",
-};
-
-const createId = () =>
-  typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2);
-
-const formatDate = (date: Date) => {
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
-export default function CreateCourse({
-  authors: authorsProp = [],
-  onAddAuthor,
-  onAddCourse,
-  onCancel,
-}: CreateCourseProps = {}) {
-  const dispatch = useAppDispatch();
-  const sourceAuthors: Author[] = Array.isArray(authorsProp) ? authorsProp : [];
-  const initialAuthors: Author[] = sourceAuthors.map((a) => ({
-    id: a.id,
-    name: a.name,
-  }));
-
-  const [form, setForm] = useState<CreateCourseFormState>(initialFormState);
-  const [errors, setErrors] = useState<Partial<CreateCourseFormState>>({});
-  const [authors, setAuthors] = useState<Author[]>(initialAuthors);
-  const [courseAuthors, setCourseAuthors] = useState<Author[]>([]);
-  const [newAuthorName, setNewAuthorName] = useState("");
-  const [authorError, setAuthorError] = useState<string | undefined>(undefined);
-  const fallbackAuthors: Author[] = [];
-
-  useEffect(() => {
-    if (Array.isArray(authorsProp)) {
-      setAuthors(authorsProp);
-    }
-  }, [authorsProp]);
-
-  const formattedDuration = getCourseDuration(form.duration);
-
-  const handleInputChange =
-    (field: keyof CreateCourseFormState) =>
-    (e: ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    };
-
-  const handleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setForm((prev) => ({ ...prev, description: e.target.value }));
-    setErrors((prev) => ({ ...prev, description: undefined }));
-  };
-
-  const handleDurationChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const nextValue = e.target.value;
-    if (!/^\d*$/.test(nextValue)) return;
-
-    setForm((prev) => ({ ...prev, duration: nextValue }));
-    setErrors((prev) => ({ ...prev, duration: undefined }));
-  };
-
-  const handleAddExistingAuthor = (author: Author) => {
-    if (courseAuthors.some((a) => a.id === author.id)) return;
-    setCourseAuthors((prev) => [...prev, author]);
-    setAuthors((prev) => prev.filter((a) => a.id !== author.id));
-  };
-
-  const handleRemoveCourseAuthor = (author: Author) => {
-    setCourseAuthors((prev) => prev.filter((a) => a.id !== author.id));
-    setAuthors((prev) => (prev.some((a) => a.id === author.id) ? prev : [...prev, author]));
-  };
-
-  const handleCreateAuthor = () => {
-    const trimmed = newAuthorName.trim();
-    if (!trimmed) {
-      setAuthorError("Author name is required.");
-      return;
-    }
-
-    if (trimmed.length < 2) {
-      setAuthorError("Author name should be at least 2 characters.");
-      return;
-    }
-
-    if (authors.some((a) => a.name === trimmed) || courseAuthors.some((a) => a.name === trimmed)) {
-      setAuthorError("Author already exists.");
-      return;
-    }
-
-    const newAuthor = { id: createId(), name: trimmed };
-    setAuthors((prev) => [...prev, newAuthor]);
-    dispatch(addAuthorAction(newAuthor));
-    onAddAuthor?.(newAuthor);
-    setNewAuthorName("");
-    setAuthorError(undefined);
-  };
-
-  const validateForm = () => {
-    const nextErrors: Partial<CreateCourseFormState> = {};
-
-    const trimmedTitle = form.title.trim();
-    const trimmedDescription = form.description.trim();
-
-    if (!trimmedTitle || trimmedTitle.length < 2) {
-      nextErrors.title = "Title is required and should be at least 2 characters.";
-    }
-
-    if (!form.description.trim() || trimmedDescription.length < 2) {
-      nextErrors.description = "Description is required and should be at least 2 characters.";
-    }
-
-    const trimmedDuration = form.duration.trim();
-
-    if (!trimmedDuration) {
-      nextErrors.duration = "Duration is required and should be greater than 0.";
-    } else if (!/^\d+$/.test(trimmedDuration)) {
-      nextErrors.duration = "Duration must be a number.";
-    } else if (Number(trimmedDuration) <= 0) {
-      nextErrors.duration = "Duration is required and should be greater than 0.";
-    }
-
-    setErrors(nextErrors);
-
-    return Object.keys(nextErrors).length === 0;
-  };
-
-  const submitForm = () => {
-    const isValid = validateForm();
-    if (!isValid) return;
-
-    const newCourse: Course = {
-      id: createId(),
-      title: form.title.trim(),
-      description: form.description.trim(),
-      creationDate: formatDate(new Date()),
-      duration: Number(form.duration.trim()),
-      authors: courseAuthors.map((author) => author.id),
-    };
-
-    dispatch(addCourseAction(newCourse));
-    onAddCourse?.(newCourse);
-
-    // reset form and move authors back for next creation
-    setForm(initialFormState);
-    setErrors({});
-    setAuthors((prev) => [...prev, ...courseAuthors]);
-    setCourseAuthors([]);
-    setNewAuthorName("");
-    setAuthorError(undefined);
-  };
-
-  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    submitForm();
-  };
-
-  return (
-    <>
-      <div className="container-create-course-page">
-        <div className="container-create-course-header">
-          <h3 className="create-course-main-header">Course Edit/Create Page</h3>
-        </div>
-        <div className="container-create-course-form">
-          <form onSubmit={handleFormSubmit} noValidate>
-            <div className="container-create-course-main-info">
-              <h4 className="create-course-sub-header">
-                Main Info
-              </h4>
-              <Input 
-                labelText="Title"
-                placeholderText="Input text"
-                type="text"
-                value={form.title}
-                onChange={handleInputChange("title")}
-                className={`create-course-input-title${errors.title ? " input-error" : ""}`}
-              />
-              {errors.title && <span className="validation-error">{errors.title}</span>}
-              <label>
-                Description
-                <textarea 
-                  className={`create-course-textarea-description${errors.description ? " input-error" : ""}`}
-                  placeholder="Input text"
-                  value={form.description}
-                  onChange={handleDescriptionChange}
-                />
-              </label>
-              {errors.description && <span className="validation-error">{errors.description}</span>}
-            </div>
-            <div className="container-create-course-duration">
-              <h4 className="create-course-sub-header">
-                Duration
-              </h4>
-              <div className="create-course-duration-input">
-                <Input
-                  labelText="Duration"
-                  placeholderText="Input text"
-                  type="text"
-                  value={form.duration}
-                  onChange={handleDurationChange}
-                  className={`create-course-input-duration${errors.duration ? " input-error" : ""}`}
-                />
-                <span className="create-course-formatted-duration">
-                  {formattedDuration}
-                </span>
-              </div>
-              {errors.duration && <span className="validation-error">{errors.duration}</span>}
-            </div>
-            <div className="container-create-course-authors">
-              <div className="container-create-course-authors-edit">
-                  <div className="container-create-course-authors-creation-block">
-                    <h4 className="create-course-sub-header">
-                      Authors
-                    </h4>
-                    <div className="container-create-course-authors-create">
-                    <Input
-                      placeholderText="Input text"
-                      labelText="Author Name"
-                      type="text"
-                      value={newAuthorName}
-                      onChange={(e) => {
-                        setNewAuthorName(e.target.value);
-                        setAuthorError(undefined);
-                      }}
-                      className={`create-course-input-author${authorError ? " input-error" : ""}`}
-                    />
-                    <Button
-                      buttonText="CREATE AUTHOR"
-                      className="btn-primary"
-                      type="button"
-                      onClick={handleCreateAuthor}
-                    />
-                    {authorError && (
-                      <span className="validation-error">{authorError}</span>
-                    )}
-                  </div>
-                    <div className="container-create-course-authors-edit">
-                      <h5 className="create-course-small-header">
-                        Authors List
-                      </h5>
-                      {(authors.length ? authors : fallbackAuthors).map((author) => (
-                        <AuthorItem
-                          key={author.id}
-                          name={author.name}
-                          onAdd={authors.length ? () => handleAddExistingAuthor(author) : undefined}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="container-create-course-authors-show">
-                  <h4 className="create-course-sub-header">
-                    Course Authors
-                  </h4>
-                {courseAuthors.length === 0 ? (
-                  <span className="create-course-authors-show-list">
-                    Author list is empty
-                  </span>
-                ) : (
-                  courseAuthors.map((author) => (
-                    <AuthorItem
-                      key={author.id}
-                      name={author.name}
-                      onDelete={() => handleRemoveCourseAuthor(author)}
-                    />
-                  ))
-                )}
-                </div>
-              </div>
-          </form>
-        </div>
-        <div className="container-create-course-buttons">
-          <Button
-            className="btn-primary"
-            buttonText="CANCEL"
-            type="button"
-            onClick={() => {
-              setForm(initialFormState);
-              setErrors({});
-              setCourseAuthors([]);
-              setNewAuthorName("");
-              setAuthorError(undefined);
-              onCancel?.();
-            }}
-          />
-          <Button
-            className="btn-primary"
-            buttonText="CREATE COURSE"
-            type="submit"
-            onClick={submitForm}
-          />
-        </div>
-      </div>
-    </>
-  );
+function generateId() {
+    return crypto.randomUUID();
 }
+
+function getCurrentDate() {
+    const currentDate = new Date();
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const year = currentDate.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
+
+function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
+    const [formValues, setFormValues] =
+        useState<CourseFormValues>(initialFormValues);
+    const [errors, setErrors] = useState<CourseFormErrors>({});
+    const [courseAuthorIds, setCourseAuthorIds] = useState<string[]>([]);
+    const [authorsList, setAuthorsList] = useState<Author[]>(mockedAuthorsList);
+
+    const availableAuthors = authorsList.filter(
+        (author) => !courseAuthorIds.includes(author.id)
+    );
+    const courseAuthors = authorsList.filter((author) =>
+        courseAuthorIds.includes(author.id)
+    );
+    const durationInMinutes = Number(formValues.duration) || 0;
+
+    function updateField(fieldName: keyof CourseFormValues, value: string) {
+        setFormValues((currentValues) => ({
+            ...currentValues,
+            [fieldName]: value,
+        }));
+
+        if (errors[fieldName]) {
+            setErrors((currentErrors) => ({
+                ...currentErrors,
+                [fieldName]: undefined,
+            }));
+        }
+    }
+
+    function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+        const fieldName = event.target.name as keyof CourseFormValues;
+        updateField(fieldName, event.target.value);
+    }
+
+    function handleDescriptionChange(event: ChangeEvent<HTMLTextAreaElement>) {
+        updateField("description", event.target.value);
+    }
+
+    function handleDurationChange(event: ChangeEvent<HTMLInputElement>) {
+        const numericValue = event.target.value.replace(/\D/g, "");
+        updateField("duration", numericValue);
+    }
+
+    function handleCreateAuthor() {
+        const trimmedAuthorName = formValues.authorName.trim();
+
+        if (!trimmedAuthorName) {
+            setErrors((currentErrors) => ({
+                ...currentErrors,
+                authorName: "Author name is required.",
+            }));
+            return;
+        }
+
+        if (trimmedAuthorName.length < 2) {
+            setErrors((currentErrors) => ({
+                ...currentErrors,
+                authorName: "Author name should be at least 2 characters.",
+            }));
+            return;
+        }
+
+        setAuthorsList((currentAuthors) => [
+            ...currentAuthors,
+            {
+                id: generateId(),
+                name: trimmedAuthorName,
+            },
+        ]);
+        updateField("authorName", "");
+    }
+
+    function handleAddAuthor(authorId: string) {
+        setCourseAuthorIds((currentIds) => [...currentIds, authorId]);
+    }
+
+    function handleRemoveCourseAuthor(authorId: string) {
+        setCourseAuthorIds((currentIds) =>
+            currentIds.filter((id) => id !== authorId)
+        );
+    }
+
+    function validateCourse() {
+        const validationErrors: CourseFormErrors = {};
+        const trimmedTitle = formValues.title.trim();
+        const trimmedDescription = formValues.description.trim();
+
+        if (trimmedTitle.length < 2) {
+            validationErrors.title =
+                "Title is required and should be at least 2 characters.";
+        }
+
+        if (trimmedDescription.length < 2) {
+            validationErrors.description =
+                "Description is required and should be at least 2 characters.";
+        }
+
+        if (!formValues.duration || durationInMinutes <= 0) {
+            validationErrors.duration =
+                "Duration is required and should be greater than 0.";
+        }
+
+        return validationErrors;
+    }
+
+    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        const validationErrors = validateCourse();
+        setErrors((currentErrors) => ({
+            authorName: currentErrors.authorName,
+            ...validationErrors,
+        }));
+
+        if (Object.keys(validationErrors).length > 0) {
+            return;
+        }
+
+        const newCourse: Course = {
+            id: generateId(),
+            title: formValues.title.trim(),
+            description: formValues.description.trim(),
+            creationDate: getCurrentDate(),
+            duration: durationInMinutes,
+            authors: courseAuthorIds,
+        };
+
+        setFormValues({ ...initialFormValues });
+        setCourseAuthorIds([]);
+        setErrors({});
+        setCourses?.((currentCourses) => [...currentCourses, newCourse]);
+        changeMode?.();
+    }
+
+    return (
+        <main className="create-course">
+            <h1 className="create-course__title">Course Edit/Create Page</h1>
+
+            <form
+                className="create-course__form"
+                id="create-course-form"
+                noValidate
+                onSubmit={handleSubmit}
+            >
+                <section className="create-course__main-info">
+                    <h2>Main Info</h2>
+                    <Input
+                        errorText={errors.title}
+                        labelText="Title"
+                        name="title"
+                        placeholderText="Input text"
+                        required
+                        value={formValues.title}
+                        onChange={handleInputChange}
+                    />
+                    <Textarea
+                        errorText={errors.description}
+                        labelText="Description"
+                        name="description"
+                        placeholderText="Input text"
+                        required
+                        value={formValues.description}
+                        onChange={handleDescriptionChange}
+                    />
+                </section>
+
+                <section className="create-course__duration">
+                    <h2>Duration</h2>
+                    <div className="create-course__duration-control">
+                        <Input
+                            errorText={errors.duration}
+                            labelText="Duration"
+                            name="duration"
+                            placeholderText="Input text"
+                            required
+                            value={formValues.duration}
+                            onChange={handleDurationChange}
+                        />
+                        <strong>{getCourseDuration(durationInMinutes)}</strong>
+                    </div>
+                </section>
+
+                <div className="create-course__authors-columns">
+                    <section className="create-course__authors">
+                        <h2>Authors</h2>
+                        <div className="create-course__author-control">
+                            <Input
+                                errorText={errors.authorName}
+                                labelText="Author Name"
+                                name="authorName"
+                                placeholderText="Input text"
+                                value={formValues.authorName}
+                                onChange={handleInputChange}
+                            />
+                            <Button
+                                buttonText="Create author"
+                                onClick={handleCreateAuthor}
+                            />
+                        </div>
+
+                        <h3>Authors List</h3>
+                        <div className="create-course__authors-list">
+                            {availableAuthors.length > 0 ? (
+                                availableAuthors.map((author) => (
+                                    <AuthorItem
+                                        key={author.id}
+                                        author={author}
+                                        buttonText="Add author"
+                                        onButtonClick={handleAddAuthor}
+                                    />
+                                ))
+                            ) : (
+                                <p>Author list is empty</p>
+                            )}
+                        </div>
+                    </section>
+
+                    <section className="create-course__course-authors">
+                        <h2>Course Authors</h2>
+                        <div className="create-course__authors-list">
+                            {courseAuthors.length > 0 ? (
+                                courseAuthors.map((author) => (
+                                    <AuthorItem
+                                        key={author.id}
+                                        author={author}
+                                        buttonText="Delete author"
+                                        onButtonClick={handleRemoveCourseAuthor}
+                                    />
+                                ))
+                            ) : (
+                                <p>Author list is empty</p>
+                            )}
+                        </div>
+                    </section>
+                </div>
+            </form>
+
+            <div className="create-course__actions">
+                <Button buttonText="Cancel" onClick={changeMode} />
+                <Button
+                    buttonText="Create course"
+                    form="create-course-form"
+                    type="submit"
+                />
+            </div>
+        </main>
+    );
+}
+
+export default CreateCourse;

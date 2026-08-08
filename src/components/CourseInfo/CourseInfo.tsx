@@ -1,101 +1,85 @@
-import { useMemo } from "react";
-import Button from "../../common/Button/Button";
+import { Link, Navigate, useParams } from "react-router-dom";
+import {
+    BACK_BUTTON_TEXT,
+    mockedAuthorsList,
+    mockedCoursesList,
+    ROUTES,
+} from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
+import type { Author, Course } from "../../types/course";
 import "./CourseInfo.css";
-import { Link, useParams } from "react-router-dom";
-import { useAppSelector } from "../../store/hooks";
-import { selectAuthors, selectCourses } from "../../store/selectors";
 
-type CourseInfoProps = {
-  id: string;
-  title: string;
-  description: string;
-  duration: number | string;
-  creationDate: string;
-  authors?: string[];
-  onBack?: () => void;
-};
+type CourseInfoProps = Readonly<{
+    courses?: Course[];
+    authorsList?: Author[];
+}>;
 
-export default function CourseInfo({
-  id,
-  title,
-  description,
-  duration,
-  creationDate,
-  authors,
-  onBack,
+function CourseInfo({
+    courses = mockedCoursesList,
+    authorsList = mockedAuthorsList,
 }: CourseInfoProps) {
-  const params = useParams();
-  const courses = useAppSelector(selectCourses);
-  const authorsListFromStore = useAppSelector(selectAuthors);
+    const { courseId } = useParams<{ courseId: string }>();
+    const course = courses.find(
+        (currentCourse) => currentCourse.id === courseId
+    );
 
-  const courseId = id || params.courseId || "";
-  const courseFromStore = useMemo(
-    () => courses.find((course) => course.id === courseId),
-    [courses, courseId]
-  );
+    if (!course) {
+        return <Navigate to={ROUTES.COURSES} replace />;
+    }
 
-  const authorsDictionary = useMemo(() => {
-    const dict: Record<string, string> = {};
-    authorsListFromStore.forEach((a) => {
-      dict[a.id] = a.name;
+    const authorsNames = course.authors.map((authorId) => {
+        const author = authorsList.find(
+            (currentAuthor) => currentAuthor.id === authorId
+        );
+
+        return author ? author.name : authorId;
     });
-    return dict;
-  }, [authorsListFromStore]);
 
-  const resolvedTitle = title || courseFromStore?.title || "";
-  const resolvedDescription = description || courseFromStore?.description || "";
-  const resolvedDuration = duration ?? courseFromStore?.duration ?? 0;
-  const resolvedCreationDate = creationDate || courseFromStore?.creationDate || "";
+    return (
+        <main className="course-info">
+            <div className="course-info__content">
+                <h1 className="course-info__title">{course.title}</h1>
 
-  const rawAuthors = authors && authors.length ? authors : courseFromStore?.authors || [];
-  const resolvedAuthors =
-    typeof rawAuthors[0] === "string"
-      ? (rawAuthors as string[]).map((authorIdOrName) => authorsDictionary[authorIdOrName] || authorIdOrName)
-      : [];
+                <div className="course-info__card">
+                    <div className="course-info__description">
+                        <h2 className="course-info__subtitle">Description:</h2>
+                        <p>{course.description}</p>
+                    </div>
 
-  const authorsList = resolvedAuthors.join(", ");
-  const formattedDate = formatCreationDate(resolvedCreationDate);
-  const formattedDuration = getCourseDuration(resolvedDuration);
-  const displayId = courseId || courseFromStore?.id || "";
-  const handleBack = onBack || (() => {});
+                    <div className="course-info__details">
+                        <p>
+                            <strong>ID:</strong>
+                            <span>{course.id}</span>
+                        </p>
+                        <p>
+                            <strong>Duration:</strong>
+                            <span>{getCourseDuration(course.duration)}</span>
+                        </p>
+                        <p>
+                            <strong>Created:</strong>
+                            <span>
+                                {formatCreationDate(course.creationDate)}
+                            </span>
+                        </p>
+                        <p>
+                            <strong>Authors:</strong>
+                            <span>{authorsNames.join(", ")}</span>
+                        </p>
+                    </div>
+                </div>
 
-  return (
-    <section className="course-info">
-      <h2 className="course-info__title">{resolvedTitle}</h2>
-
-      <div className="course-info__card">
-        <div className="course-info__description-block">
-          <h3 className="course-info__section-title">Description:</h3>
-          <p className="course-info__description">{resolvedDescription}</p>
-        </div>
-
-        <div className="course-info__details">
-          <div className="course-info__row">
-            <span className="course-info__label">ID:</span>
-            <span className="course-info__value course-info__value--mono">{displayId}</span>
-          </div>
-          <div className="course-info__row">
-            <span className="course-info__label">Duration:</span>
-            <span className="course-info__value">{formattedDuration}</span>
-          </div>
-          <div className="course-info__row">
-            <span className="course-info__label">Created:</span>
-            <span className="course-info__value">{formattedDate}</span>
-          </div>
-          <div className="course-info__row">
-            <span className="course-info__label">Authors:</span>
-            <span className="course-info__value">{authorsList}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="course-info__actions">
-        <Link to="/courses">
-          <Button className="course-info__back" buttonText="BACK" onClick={handleBack} />
-        </Link>
-      </div>
-    </section>
-  );
+                <div className="course-info__button">
+                    <Link
+                        className="course-info__back-link"
+                        to={ROUTES.COURSES}
+                    >
+                        {BACK_BUTTON_TEXT}
+                    </Link>
+                </div>
+            </div>
+        </main>
+    );
 }
+
+export default CourseInfo;

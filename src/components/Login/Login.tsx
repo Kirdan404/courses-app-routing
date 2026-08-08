@@ -1,146 +1,157 @@
 import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
-import { useAppDispatch } from "../../store/hooks";
-import { setUser } from "../../store/user/userSlice";
-
+import { API_BASE_URL, ROUTES, STORAGE_KEYS } from "../../constants";
 import "./Login.css";
 
-type LoginFormState = {
-  email: string;
-  password: string;
+type LoginFormValues = {
+    email: string;
+    password: string;
 };
 
-type LoginProps = {
-  onLoginSuccess?: (name: string) => void;
-};
+type LoginFormErrors = Partial<Record<keyof LoginFormValues, string>>;
 
-const initialState: LoginFormState = {
-  email: "",
-  password: "",
-};
-
-const isEmailValid = (value: string) => /\S+@\S+\.\S+/.test(value);
-
-export default function Login({ onLoginSuccess }: LoginProps) {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const [form, setForm] = useState<LoginFormState>(initialState);
-  const [errors, setErrors] = useState<Partial<LoginFormState>>({});
-  const [apiError, setApiError] = useState<string | null>(null);
-
-  const handleChange =
-    (field: keyof LoginFormState) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
+type LoginResponse = {
+    successful?: boolean;
+    result?: string;
+    errors?: string[];
+    user?: {
+        name?: string;
     };
+};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const nextErrors: Partial<LoginFormState> = {};
+type LoginProps = Readonly<{
+    onLoginSuccess?: (userName: string) => void;
+}>;
 
-    if (!form.email.trim()) {
-      nextErrors.email = "Email is required.";
-    } else if (!isEmailValid(form.email)) {
-      nextErrors.email = "Email is invalid.";
+const initialFormValues: LoginFormValues = {
+    email: "",
+    password: "",
+};
+
+function Login({ onLoginSuccess }: LoginProps) {
+    const navigate = useNavigate();
+    const [formValues, setFormValues] =
+        useState<LoginFormValues>(initialFormValues);
+    const [errors, setErrors] = useState<LoginFormErrors>({});
+    const [serverError, setServerError] = useState("");
+
+    function handleChange(event: ChangeEvent<HTMLInputElement>) {
+        const fieldName = event.target.name as keyof LoginFormValues;
+        const { value } = event.target;
+
+        setFormValues((currentValues) => ({
+            ...currentValues,
+            [fieldName]: value,
+        }));
+
+        if (errors[fieldName] && value.trim()) {
+            setErrors((currentErrors) => ({
+                ...currentErrors,
+                [fieldName]: undefined,
+            }));
+        }
     }
 
-    if (!form.password.trim()) {
-      nextErrors.password = "Password is required.";
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        const validationErrors: LoginFormErrors = {};
+
+        if (!formValues.email.trim()) {
+            validationErrors.email = "Email is required.";
+        }
+
+        if (!formValues.password.trim()) {
+            validationErrors.password = "Password is required.";
+        }
+
+        setErrors(validationErrors);
+
+        if (Object.keys(validationErrors).length > 0) {
+            return;
+        }
+
+        setServerError("");
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: formValues.email.trim(),
+                    password: formValues.password,
+                }),
+            });
+            const result = (await response.json()) as LoginResponse;
+
+            if ((response.ok || result.successful) && result.result) {
+                const userName = result.user?.name ?? "";
+
+                localStorage.setItem(STORAGE_KEYS.TOKEN, result.result);
+                localStorage.setItem(STORAGE_KEYS.USER_NAME, userName);
+                onLoginSuccess?.(userName);
+                navigate(ROUTES.COURSES);
+                return;
+            }
+
+            setServerError(result.errors?.join(", ") ?? "Login failed.");
+        } catch {
+            setServerError("Unable to connect to the server.");
+        }
     }
 
-    setErrors(nextErrors);
+    return (
+        <main className="login">
+            <h1 className="login__title">Login</h1>
 
-    const hasErrors = Object.values(nextErrors).some(Boolean);
-    if (hasErrors) return;
+            <form className="login__form" noValidate onSubmit={handleSubmit}>
+                <div className="login__fields">
+                    <Input
+                        errorText={errors.email}
+                        labelText="Email"
+                        name="email"
+                        placeholderText="Input text"
+                        required
+                        type="email"
+                        value={formValues.email}
+                        onChange={handleChange}
+                    />
+                    <Input
+                        errorText={errors.password}
+                        labelText="Password"
+                        name="password"
+                        placeholderText="Input text"
+                        required
+                        type="password"
+                        value={formValues.password}
+                        onChange={handleChange}
+                    />
+                </div>
 
-    try {
-      const response = await fetch("http://localhost:4000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email.trim(),
-          password: form.password,
-        }),
-      });
+                <Button
+                    buttonText="Login"
+                    className="login__submit"
+                    type="submit"
+                />
 
-      const result = await response.json();
+                {serverError && (
+                    <p className="login__error" role="alert">
+                        {serverError}
+                    </p>
+                )}
 
-      if (!response.ok) {
-        setApiError(result?.result || "Login failed");
-        return;
-      }
-
-      // if backend returns user info, you can adjust accordingly
-      const userName = result?.user?.name || "";
-      const token = result.result || "";
-      const userEmail = form.email.trim();
-
-      if (userName || userEmail) {
-        localStorage.setItem("user", JSON.stringify({ name: userName, email: userEmail }));
-      } else {
-        localStorage.removeItem("user");
-      }
-      localStorage.setItem("token", token);
-      dispatch(setUser({ name: userName, email: userEmail, token }));
-      onLoginSuccess?.(userName);
-      navigate("/courses");
-    } catch (err) {
-      setApiError("Network error. Please try again.");
-    }
-  };
-
-  return (
-    <div className="login-container">
-      <h3 className="login-title">Login</h3>
-
-      <div className="login-form-container">
-        <form className="login-form" onSubmit={handleSubmit} noValidate>
-          <div className="login-field">
-            <Input
-              labelText="Email"
-              placeholderText="Input text"
-              type="email"
-              value={form.email}
-              onChange={handleChange("email")}
-              className={errors.email ? "input-error" : undefined}
-            />
-            {errors.email && <span className="validation-error">{errors.email}</span>}
-          </div>
-
-          <div className="login-field">
-            <Input
-              labelText="Password"
-              placeholderText="Input text"
-              type="password"
-              value={form.password}
-              onChange={handleChange("password")}
-              className={errors.password ? "input-error" : undefined}
-            />
-            {errors.password && (
-              <span className="validation-error">{errors.password}</span>
-            )}
-          </div>
-
-          <Button
-            buttonText="LOGIN"
-            className="btn-primary btn-login-submit"
-            type="submit"
-            onClick={() => {}}
-          />
-          {apiError && <span className="validation-error">{apiError}</span>}
-
-          <p className="login-info">
-            If you don&apos;t have an account you may{" "}
-            <b>
-              <Link to="/registration">Registration</Link>
-            </b>
-          </p>
-        </form>
-      </div>
-    </div>
-  );
+                <p className="login__registration-message">
+                    If you don&apos;t have an account you may{" "}
+                    <Link to={ROUTES.REGISTRATION}>Registration</Link>
+                </p>
+            </form>
+        </main>
+    );
 }
+
+export default Login;

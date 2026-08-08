@@ -1,63 +1,49 @@
 import Button from "../../common/Button/Button";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LOGOUT_BUTTON_TEXT, ROUTES, STORAGE_KEYS } from "../../constants";
 import Logo from "./components/Logo/Logo";
 import "./Header.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { logout as logoutAction } from "../../store/user/userSlice";
 
-type HeaderProps = {
-  buttonText?: string;
-  onLogout?: () => void;
-};
+type HeaderProps = Readonly<{
+    showUserActions?: boolean;
+    userName?: string;
+    onLogout?: () => void;
+}>;
 
-const Header = ({ buttonText = "Logout", onLogout = () => {} }: HeaderProps) => {
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isAuth = useMemo(() => Boolean(localStorage.getItem("token") || user.isAuth || user.token), [user.isAuth, user.token]);
-  const storedUserRaw = localStorage.getItem("user");
-  let storedUserName = "";
-  if (storedUserRaw) {
-    try {
-      const parsed = JSON.parse(storedUserRaw);
-      if (parsed && typeof parsed === "object") {
-        storedUserName = (parsed as { name?: string }).name || "";
-      } else {
-        storedUserName = storedUserRaw;
-      }
-    } catch (err) {
-      storedUserName = storedUserRaw;
+function Header({ showUserActions = true, userName, onLogout }: HeaderProps) {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+    const displayedUserName =
+        userName ?? localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
+    const isAuthenticationPage =
+        location.pathname === ROUTES.LOGIN ||
+        location.pathname === ROUTES.REGISTRATION;
+
+    function handleLogout() {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER_NAME);
+        onLogout?.();
+        navigate(ROUTES.LOGIN);
     }
-  }
-  const displayUserName = user.name || storedUserName;
-  const displayButtonText = buttonText || "Logout";
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("userName");
-    dispatch(logoutAction());
-    onLogout();
-    navigate("/login");
-  };
+    return (
+        <header className="header">
+            <Logo />
 
-  return (
-    <header className="header">
-      <div className="header__inner">
-        <Link to={isAuth ? "/courses" : "/login"}>
-          <Logo />
-        </Link>
-        {isAuth && (
-          <div className="header__actions">
-            {displayUserName && <span className="header__user">{displayUserName}</span>}
-            <Button className="header__button" buttonText={displayButtonText} onClick={handleLogout} />
-          </div>
-        )}
-      </div>
-    </header>
-  );
-};
+            {showUserActions && token && !isAuthenticationPage && (
+                <div className="header__actions">
+                    <span className="header__user-name">
+                        {displayedUserName}
+                    </span>
+                    <Button
+                        buttonText={LOGOUT_BUTTON_TEXT}
+                        onClick={handleLogout}
+                    />
+                </div>
+            )}
+        </header>
+    );
+}
 
 export default Header;
