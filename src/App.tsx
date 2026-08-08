@@ -14,7 +14,7 @@ import CreateCourse from "./components/CreateCourse/CreateCourse";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
-import { mockedCoursesList, STORAGE_KEYS } from "./constants";
+import { mockedCoursesList, ROUTES, STORAGE_KEYS } from "./constants";
 import type { Course } from "./types/course";
 
 type CreateCoursePageProps = Readonly<{
@@ -26,7 +26,7 @@ function CreateCoursePage({ setCourses }: CreateCoursePageProps) {
 
     return (
         <CreateCourse
-            changeMode={() => navigate("/courses")}
+            changeMode={() => navigate(ROUTES.COURSES)}
             setCourses={setCourses}
         />
     );
@@ -60,12 +60,12 @@ function App() {
             />
             <Routes>
                 <Route
-                    path="/login"
+                    path={ROUTES.LOGIN}
                     element={<Login onLoginSuccess={handleLoginSuccess} />}
                 />
-                <Route path="/registration" element={<Registration />} />
+                <Route path={ROUTES.REGISTRATION} element={<Registration />} />
                 <Route
-                    path="/courses"
+                    path={ROUTES.COURSES}
                     element={
                         <PrivateRoute>
                             <Courses courses={courses} />
@@ -73,7 +73,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/courses/add"
+                    path={ROUTES.CREATE_COURSE}
                     element={
                         <PrivateRoute>
                             <CreateCoursePage setCourses={setCourses} />
@@ -81,15 +81,21 @@ function App() {
                     }
                 />
                 <Route
-                    path="/courses/:courseId"
+                    path={ROUTES.COURSE_INFO}
                     element={
                         <PrivateRoute>
                             <CourseInfo courses={courses} />
                         </PrivateRoute>
                     }
                 />
-                <Route path="/" element={<Navigate to="/courses" replace />} />
-                <Route path="*" element={<Navigate to="/courses" replace />} />
+                <Route
+                    path={ROUTES.HOME}
+                    element={<Navigate to={ROUTES.COURSES} replace />}
+                />
+                <Route
+                    path={ROUTES.NOT_FOUND}
+                    element={<Navigate to={ROUTES.COURSES} replace />}
+                />
             </Routes>
         </BrowserRouter>
     );

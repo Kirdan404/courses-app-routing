@@ -5,6 +5,7 @@ import {
     ADD_NEW_COURSE_BUTTON_TEXT,
     mockedAuthorsList,
     mockedCoursesList,
+    ROUTES,
 } from "../../constants";
 import type { Course } from "../../types/course";
 import CourseCard from "./components/CourseCard/CourseCard";
@@ -37,7 +38,7 @@ function Courses({ courses = mockedCoursesList }: CoursesProps) {
                     <SearchBar onSearch={setSearchQuery} />
                     <Button
                         buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
-                        onClick={() => navigate("/courses/add")}
+                        onClick={() => navigate(ROUTES.CREATE_COURSE)}
                     />
                 </div>
 
@@ -48,7 +49,12 @@ function Courses({ courses = mockedCoursesList }: CoursesProps) {
                             course={course}
                             authorsList={mockedAuthorsList}
                             onShowCourse={(courseId) =>
-                                navigate(`/courses/${courseId}`)
+                                navigate(
+                                    ROUTES.COURSE_INFO.replace(
+                                        ":courseId",
+                                        courseId
+                                    )
+                                )
                             }
                         />
                     ))}

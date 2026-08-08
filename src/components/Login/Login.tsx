@@ -3,7 +3,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
-import { STORAGE_KEYS } from "../../constants";
+import { ROUTES, STORAGE_KEYS } from "../../constants";
 import "./Login.css";
 
 type LoginFormValues = {
@@ -95,7 +95,7 @@ function Login({ onLoginSuccess }: LoginProps) {
                 localStorage.setItem(STORAGE_KEYS.TOKEN, result.result);
                 localStorage.setItem(STORAGE_KEYS.USER_NAME, userName);
                 onLoginSuccess?.(userName);
-                navigate("/courses");
+                navigate(ROUTES.COURSES);
                 return;
             }
 
@@ -147,7 +147,7 @@ function Login({ onLoginSuccess }: LoginProps) {
 
                 <p className="login__registration-message">
                     If you don&apos;t have an account you may{" "}
-                    <Link to="/registration">Registration</Link>
+                    <Link to={ROUTES.REGISTRATION}>Registration</Link>
                 </p>
             </form>
         </main>

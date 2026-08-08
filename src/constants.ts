@@ -6,6 +6,15 @@ export const STORAGE_KEYS = {
     TOKEN: "token",
     USER_NAME: "userName",
 } as const;
+export const ROUTES = {
+    HOME: "/",
+    LOGIN: "/login",
+    REGISTRATION: "/registration",
+    COURSES: "/courses",
+    CREATE_COURSE: "/courses/add",
+    COURSE_INFO: "/courses/:courseId",
+    NOT_FOUND: "*",
+} as const;
 export const SHOW_COURSE_BUTTON_TEXT = "Show course";
 export const ADD_NEW_COURSE_BUTTON_TEXT = "Add new course";
 export const BACK_BUTTON_TEXT = "Back";
