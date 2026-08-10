@@ -35,7 +35,7 @@ const userSlice = createSlice({
             state.email = action.payload.email;
             state.token = action.payload.token;
         },
-        logout(state) {
+        removeUser(state) {
             state.isAuth = false;
             state.name = "";
             state.email = "";
@@ -44,5 +44,5 @@ const userSlice = createSlice({
     },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, removeUser } = userSlice.actions;
 export default userSlice.reducer;

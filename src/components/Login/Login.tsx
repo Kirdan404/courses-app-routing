@@ -3,7 +3,8 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
-import { API_BASE_URL, ROUTES, STORAGE_KEYS } from "../../constants";
+import { ROUTES, STORAGE_KEYS } from "../../constants";
+import { loginUser } from "../../services/services";
 import { useAppDispatch } from "../../store/hooks";
 import { login } from "../../store/user/userSlice";
 import "./Login.css";
@@ -14,16 +15,6 @@ type LoginFormValues = {
 };
 
 type LoginFormErrors = Partial<Record<keyof LoginFormValues, string>>;
-
-type LoginResponse = {
-    successful?: boolean;
-    result?: string;
-    errors?: string[];
-    user?: {
-        name?: string;
-        email?: string;
-    };
-};
 
 type LoginProps = Readonly<{
     onLoginSuccess?: (userName: string) => void;
@@ -81,19 +72,12 @@ function Login({ onLoginSuccess }: LoginProps) {
         setServerError("");
 
         try {
-            const response = await fetch(`${API_BASE_URL}/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: formValues.email.trim(),
-                    password: formValues.password,
-                }),
-            });
-            const result = (await response.json()) as LoginResponse;
+            const { ok, data: result } = await loginUser(
+                formValues.email.trim(),
+                formValues.password
+            );
 
-            if ((response.ok || result.successful) && result.result) {
+            if ((ok || result.successful) && result.result) {
                 const userName = result.user?.name ?? "";
                 const userEmail = result.user?.email ?? formValues.email.trim();
 
