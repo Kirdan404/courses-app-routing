@@ -1,7 +1,11 @@
 import Button from "../../../../common/Button/Button";
+import deleteIcon from "../../../../assets/images/delete.png";
+import editIcon from "../../../../assets/images/edit.png";
 import { SHOW_COURSE_BUTTON_TEXT } from "../../../../constants";
 import formatCreationDate from "../../../../helpers/formatCreationDate";
 import getCourseDuration from "../../../../helpers/getCourseDuration";
+import { deleteCourse } from "../../../../store/courses/coursesSlice";
+import { useAppDispatch } from "../../../../store/hooks";
 import type { Author, Course } from "../../../../types/course";
 import "./CourseCard.css";
 
@@ -12,6 +16,7 @@ type CourseCardProps = Readonly<{
 }>;
 
 function CourseCard({ course, authorsList, onShowCourse }: CourseCardProps) {
+    const dispatch = useAppDispatch();
     const authorsNames = course.authors.map((authorId) => {
         const author = authorsList.find((author) => author.id === authorId);
 
@@ -41,10 +46,35 @@ function CourseCard({ course, authorsList, onShowCourse }: CourseCardProps) {
                     {formatCreationDate(course.creationDate)}
                 </p>
 
-                <Button
-                    buttonText={SHOW_COURSE_BUTTON_TEXT}
-                    onClick={() => onShowCourse?.(course.id)}
-                />
+                <div className="course-card__actions">
+                    <Button
+                        buttonText={SHOW_COURSE_BUTTON_TEXT}
+                        onClick={() => onShowCourse?.(course.id)}
+                    />
+                    <Button
+                        ariaLabel="Delete course"
+                        buttonText={
+                            <img
+                                alt=""
+                                className="course-card__action-icon"
+                                src={deleteIcon}
+                            />
+                        }
+                        className="course-card__icon-button"
+                        onClick={() => dispatch(deleteCourse(course.id))}
+                    />
+                    <Button
+                        ariaLabel="Update course"
+                        buttonText={
+                            <img
+                                alt=""
+                                className="course-card__action-icon"
+                                src={editIcon}
+                            />
+                        }
+                        className="course-card__icon-button"
+                    />
+                </div>
             </div>
         </article>
     );
