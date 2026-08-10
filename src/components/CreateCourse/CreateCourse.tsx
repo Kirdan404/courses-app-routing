@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import Textarea from "../../common/Textarea/Textarea";
@@ -14,7 +14,6 @@ import "./CreateCourse.css";
 
 type CreateCourseProps = Readonly<{
     changeMode?: () => void;
-    setCourses?: Dispatch<SetStateAction<Course[]>>;
 }>;
 
 type CourseFormValues = {
@@ -46,7 +45,7 @@ function getCurrentDate() {
     return `${day}/${month}/${year}`;
 }
 
-function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
+function CreateCourse({ changeMode }: CreateCourseProps) {
     const dispatch = useAppDispatch();
     const authorsList = useAppSelector(selectAuthors);
     const [formValues, setFormValues] =
@@ -177,7 +176,6 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
         setCourseAuthorIds([]);
         setErrors({});
         dispatch(addCourse(newCourse));
-        setCourses?.((currentCourses) => [...currentCourses, newCourse]);
         changeMode?.();
     }
 

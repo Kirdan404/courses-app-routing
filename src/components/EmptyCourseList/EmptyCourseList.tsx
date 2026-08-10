@@ -6,17 +6,24 @@ import {
 } from "../../constants";
 import "./EmptyCourseList.css";
 
-function EmptyCourseList() {
+type EmptyCourseListProps = Readonly<{
+    onAddCourse: () => void;
+}>;
+
+function EmptyCourseList({ onAddCourse }: EmptyCourseListProps) {
     return (
-        <div className="empty-course-list">
+        <main className="empty-course-list">
             <h2 className="empty-course-list__title">
                 {EMPTY_COURSE_LIST_TITLE}
             </h2>
             <p className="empty-course-list__subtitle">
                 {EMPTY_COURSE_LIST_SUBTITLE}
             </p>
-            <Button buttonText={ADD_NEW_COURSE_BUTTON_TEXT} />
-        </div>
+            <Button
+                buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
+                onClick={onAddCourse}
+            />
+        </main>
     );
 }
 

@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import {
     BrowserRouter,
     Navigate,
@@ -25,16 +26,46 @@ function CreateCoursePage() {
     return <CreateCourse changeMode={() => navigate(ROUTES.COURSES)} />;
 }
 
+type DataRouteProps = Readonly<{
+    children: ReactNode;
+    isLoading: boolean;
+}>;
+
+function DataRoute({ children, isLoading }: DataRouteProps) {
+    return (
+        <PrivateRoute>
+            {isLoading ? <main role="status">Loading...</main> : children}
+        </PrivateRoute>
+    );
+}
+
 function App() {
     const dispatch = useAppDispatch();
     const user = useAppSelector(selectUser);
+    const [loadedDataToken, setLoadedDataToken] = useState("");
 
     useEffect(() => {
-        if (user.isAuth) {
-            void dispatch(fetchCourses());
-            void dispatch(fetchAuthors());
+        if (!user.isAuth) {
+            return;
         }
-    }, [dispatch, user.isAuth]);
+
+        let isActive = true;
+
+        void Promise.all([
+            dispatch(fetchCourses()),
+            dispatch(fetchAuthors()),
+        ]).then(() => {
+            if (isActive) {
+                setLoadedDataToken(user.token);
+            }
+        });
+
+        return () => {
+            isActive = false;
+        };
+    }, [dispatch, user.isAuth, user.token]);
+
+    const isDataLoading = user.isAuth && loadedDataToken !== user.token;
 
     return (
         <BrowserRouter>
@@ -63,25 +94,25 @@ function App() {
                 <Route
                     path={ROUTES.COURSES}
                     element={
-                        <PrivateRoute>
+                        <DataRoute isLoading={isDataLoading}>
                             <Courses />
-                        </PrivateRoute>
+                        </DataRoute>
                     }
                 />
                 <Route
                     path={ROUTES.CREATE_COURSE}
                     element={
-                        <PrivateRoute>
+                        <DataRoute isLoading={isDataLoading}>
                             <CreateCoursePage />
-                        </PrivateRoute>
+                        </DataRoute>
                     }
                 />
                 <Route
                     path={ROUTES.COURSE_INFO}
                     element={
-                        <PrivateRoute>
+                        <DataRoute isLoading={isDataLoading}>
                             <CourseInfo />
-                        </PrivateRoute>
+                        </DataRoute>
                     }
                 />
                 <Route
