@@ -13,12 +13,11 @@ import CreateCourse from "./components/CreateCourse/CreateCourse";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
-import { ROUTES, STORAGE_KEYS } from "./constants";
+import { ROUTES } from "./constants";
 import { fetchAuthors } from "./store/authors/authorsSlice";
 import { fetchCourses } from "./store/courses/coursesSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { selectUser } from "./store/selectors";
-import { logout } from "./store/user/userSlice";
 
 function CreateCoursePage() {
     const navigate = useNavigate();
@@ -37,19 +36,9 @@ function App() {
         }
     }, [dispatch, user.isAuth]);
 
-    function handleLogout() {
-        localStorage.removeItem(STORAGE_KEYS.TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.USER_NAME);
-        dispatch(logout());
-    }
-
     return (
         <BrowserRouter>
-            <Header
-                showUserActions={user.isAuth}
-                userName={user.name}
-                onLogout={handleLogout}
-            />
+            <Header />
             <Routes>
                 <Route
                     path={ROUTES.LOGIN}

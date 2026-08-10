@@ -21,6 +21,7 @@ type LoginResponse = {
     errors?: string[];
     user?: {
         name?: string;
+        email?: string;
     };
 };
 
@@ -94,13 +95,14 @@ function Login({ onLoginSuccess }: LoginProps) {
 
             if ((response.ok || result.successful) && result.result) {
                 const userName = result.user?.name ?? "";
+                const userEmail = result.user?.email ?? formValues.email.trim();
 
                 localStorage.setItem(STORAGE_KEYS.TOKEN, result.result);
                 localStorage.setItem(STORAGE_KEYS.USER_NAME, userName);
                 dispatch(
                     login({
                         name: userName,
-                        email: formValues.email.trim(),
+                        email: userEmail,
                         token: result.result,
                     })
                 );
