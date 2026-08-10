@@ -34,7 +34,13 @@ type DataRouteProps = Readonly<{
 function DataRoute({ children, isLoading }: DataRouteProps) {
     return (
         <PrivateRoute>
-            {isLoading ? <main role="status">Loading...</main> : children}
+            {isLoading ? (
+                <main>
+                    <output>Loading...</output>
+                </main>
+            ) : (
+                children
+            )}
         </PrivateRoute>
     );
 }

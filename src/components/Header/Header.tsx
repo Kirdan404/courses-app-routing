@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { LOGOUT_BUTTON_TEXT, ROUTES, STORAGE_KEYS } from "../../constants";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/selectors";
-import { removeUser } from "../../store/user/userSlice";
+import { logout } from "../../store/user/userSlice";
 import Logo from "./components/Logo/Logo";
 import "./Header.css";
 
@@ -19,7 +19,7 @@ function Header() {
     function handleLogout() {
         localStorage.removeItem(STORAGE_KEYS.TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER_NAME);
-        dispatch(removeUser());
+        dispatch(logout());
         navigate(ROUTES.LOGIN);
     }
 
