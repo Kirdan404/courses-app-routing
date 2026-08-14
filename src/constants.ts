@@ -1,4 +1,5 @@
 export const API_BASE_URL = "http://localhost:4000";
+export const ADMIN_ROLE = "ADMIN";
 export const LOGOUT_BUTTON_TEXT = "Logout";
 export const STORAGE_KEYS = {
     TOKEN: "token",

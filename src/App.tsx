@@ -14,11 +14,12 @@ import CourseForm from "./components/CourseForm/CourseForm";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
-import { ROUTES } from "./constants";
+import { ADMIN_ROLE, ROUTES } from "./constants";
 import { fetchAuthors } from "./store/authors/thunk";
 import { fetchCourses } from "./store/courses/thunk";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { selectUser } from "./store/selectors";
+import { fetchCurrentUser } from "./store/user/thunk";
 
 function CourseFormPage() {
     const navigate = useNavigate();
@@ -60,6 +61,7 @@ function App() {
         void Promise.all([
             dispatch(fetchCourses()),
             dispatch(fetchAuthors()),
+            dispatch(fetchCurrentUser(user.token)),
         ]).then(() => {
             if (isActive) {
                 setLoadedDataToken(user.token);
@@ -109,7 +111,11 @@ function App() {
                     path={ROUTES.CREATE_COURSE}
                     element={
                         <DataRoute isLoading={isDataLoading}>
-                            <CourseFormPage />
+                            {user.role === ADMIN_ROLE ? (
+                                <CourseFormPage />
+                            ) : (
+                                <Navigate to={ROUTES.COURSES} replace />
+                            )}
                         </DataRoute>
                     }
                 />

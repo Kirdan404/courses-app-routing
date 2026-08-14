@@ -5,6 +5,12 @@ type ApiResponse<T> = {
     result?: T;
 };
 
+export type CurrentUser = {
+    name: string;
+    email: string;
+    role: string;
+};
+
 export type LoginResponse = {
     successful?: boolean;
     result?: string;
@@ -41,6 +47,21 @@ export const getAuthors = async (): Promise<Author[]> => {
         throw new Error("Failed to fetch authors");
     }
     return data.result ?? [];
+};
+
+export const getCurrentUser = async (token: string): Promise<CurrentUser> => {
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+        headers: {
+            Authorization: token,
+        },
+    });
+    const data = (await response.json()) as ApiResponse<CurrentUser>;
+
+    if (!response.ok || !data.result) {
+        throw new Error("Failed to fetch current user");
+    }
+
+    return data.result;
 };
 
 export const loginUser = async (

@@ -7,7 +7,7 @@ import {
 import "./EmptyCourseList.css";
 
 type EmptyCourseListProps = Readonly<{
-    onAddCourse: () => void;
+    onAddCourse?: () => void;
 }>;
 
 function EmptyCourseList({ onAddCourse }: EmptyCourseListProps) {
@@ -19,10 +19,12 @@ function EmptyCourseList({ onAddCourse }: EmptyCourseListProps) {
             <p className="empty-course-list__subtitle">
                 {EMPTY_COURSE_LIST_SUBTITLE}
             </p>
-            <Button
-                buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
-                onClick={onAddCourse}
-            />
+            {onAddCourse && (
+                <Button
+                    buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
+                    onClick={onAddCourse}
+                />
+            )}
         </main>
     );
 }

@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
-import { ADD_NEW_COURSE_BUTTON_TEXT, ROUTES } from "../../constants";
+import {
+    ADD_NEW_COURSE_BUTTON_TEXT,
+    ADMIN_ROLE,
+    ROUTES,
+} from "../../constants";
 import { useAppSelector } from "../../store/hooks";
-import { selectAuthors, selectCourses } from "../../store/selectors";
+import {
+    selectAuthors,
+    selectCourses,
+    selectUser,
+} from "../../store/selectors";
 import EmptyCourseList from "../EmptyCourseList/EmptyCourseList";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
@@ -13,11 +21,20 @@ function Courses() {
     const navigate = useNavigate();
     const courses = useAppSelector(selectCourses);
     const authors = useAppSelector(selectAuthors);
+    const user = useAppSelector(selectUser);
     const [searchQuery, setSearchQuery] = useState("");
     const navigateToCreateCourse = () => navigate(ROUTES.CREATE_COURSE);
 
     if (courses.length === 0) {
-        return <EmptyCourseList onAddCourse={navigateToCreateCourse} />;
+        return (
+            <EmptyCourseList
+                onAddCourse={
+                    user.role === ADMIN_ROLE
+                        ? navigateToCreateCourse
+                        : undefined
+                }
+            />
+        );
     }
 
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
@@ -36,10 +53,12 @@ function Courses() {
             <div className="courses__content">
                 <div className="courses__top-bar">
                     <SearchBar onSearch={setSearchQuery} />
-                    <Button
-                        buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
-                        onClick={navigateToCreateCourse}
-                    />
+                    {user.role === ADMIN_ROLE && (
+                        <Button
+                            buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
+                            onClick={navigateToCreateCourse}
+                        />
+                    )}
                 </div>
 
                 <div className="courses__list">

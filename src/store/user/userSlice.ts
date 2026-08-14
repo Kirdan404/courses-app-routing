@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { STORAGE_KEYS } from "../../constants";
+import { fetchCurrentUser } from "./thunk";
 
 type UserState = {
     isAuth: boolean;
@@ -46,6 +47,13 @@ const userSlice = createSlice({
             state.token = "";
             state.role = "";
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
+            state.name = action.payload.name;
+            state.email = action.payload.email;
+            state.role = action.payload.role;
+        });
     },
 });
 
