@@ -1,25 +1,16 @@
 import { Link, Navigate, useParams } from "react-router-dom";
-import {
-    BACK_BUTTON_TEXT,
-    mockedAuthorsList,
-    mockedCoursesList,
-    ROUTES,
-} from "../../constants";
+import { BACK_BUTTON_TEXT, ROUTES } from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
+import getCourseAuthors from "../../helpers/getCourseAuthors";
 import getCourseDuration from "../../helpers/getCourseDuration";
-import type { Author, Course } from "../../types/course";
+import { useAppSelector } from "../../store/hooks";
+import { selectAuthors, selectCourses } from "../../store/selectors";
 import "./CourseInfo.css";
 
-type CourseInfoProps = Readonly<{
-    courses?: Course[];
-    authorsList?: Author[];
-}>;
-
-function CourseInfo({
-    courses = mockedCoursesList,
-    authorsList = mockedAuthorsList,
-}: CourseInfoProps) {
+function CourseInfo() {
     const { courseId } = useParams<{ courseId: string }>();
+    const courses = useAppSelector(selectCourses);
+    const authors = useAppSelector(selectAuthors);
     const course = courses.find(
         (currentCourse) => currentCourse.id === courseId
     );
@@ -28,13 +19,7 @@ function CourseInfo({
         return <Navigate to={ROUTES.COURSES} replace />;
     }
 
-    const authorsNames = course.authors.map((authorId) => {
-        const author = authorsList.find(
-            (currentAuthor) => currentAuthor.id === authorId
-        );
-
-        return author ? author.name : authorId;
-    });
+    const authorsNames = getCourseAuthors(course.authors, authors);
 
     return (
         <main className="course-info">

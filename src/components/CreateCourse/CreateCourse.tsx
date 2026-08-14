@@ -1,17 +1,21 @@
 import { useState } from "react";
-import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import Textarea from "../../common/Textarea/Textarea";
-import { mockedAuthorsList } from "../../constants";
+import getCurrentDate from "../../helpers/getCurrentDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
-import type { Author, Course } from "../../types/course";
+import validateCourse from "../../helpers/validateCourse";
+import { addAuthor } from "../../store/authors/authorsSlice";
+import { addCourse } from "../../store/courses/coursesSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectAuthors } from "../../store/selectors";
+import type { Course } from "../../types/course";
 import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CreateCourse.css";
 
 type CreateCourseProps = Readonly<{
     changeMode?: () => void;
-    setCourses?: Dispatch<SetStateAction<Course[]>>;
 }>;
 
 type CourseFormValues = {
@@ -34,21 +38,13 @@ function generateId() {
     return crypto.randomUUID();
 }
 
-function getCurrentDate() {
-    const currentDate = new Date();
-    const day = String(currentDate.getDate()).padStart(2, "0");
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const year = currentDate.getFullYear();
-
-    return `${day}/${month}/${year}`;
-}
-
-function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
+function CreateCourse({ changeMode }: CreateCourseProps) {
+    const dispatch = useAppDispatch();
+    const authorsList = useAppSelector(selectAuthors);
     const [formValues, setFormValues] =
         useState<CourseFormValues>(initialFormValues);
     const [errors, setErrors] = useState<CourseFormErrors>({});
     const [courseAuthorIds, setCourseAuthorIds] = useState<string[]>([]);
-    const [authorsList, setAuthorsList] = useState<Author[]>(mockedAuthorsList);
 
     const availableAuthors = authorsList.filter(
         (author) => !courseAuthorIds.includes(author.id)
@@ -105,13 +101,12 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
             return;
         }
 
-        setAuthorsList((currentAuthors) => [
-            ...currentAuthors,
-            {
+        dispatch(
+            addAuthor({
                 id: generateId(),
                 name: trimmedAuthorName,
-            },
-        ]);
+            })
+        );
         updateField("authorName", "");
     }
 
@@ -125,33 +120,10 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
         );
     }
 
-    function validateCourse() {
-        const validationErrors: CourseFormErrors = {};
-        const trimmedTitle = formValues.title.trim();
-        const trimmedDescription = formValues.description.trim();
-
-        if (trimmedTitle.length < 2) {
-            validationErrors.title =
-                "Title is required and should be at least 2 characters.";
-        }
-
-        if (trimmedDescription.length < 2) {
-            validationErrors.description =
-                "Description is required and should be at least 2 characters.";
-        }
-
-        if (!formValues.duration || durationInMinutes <= 0) {
-            validationErrors.duration =
-                "Duration is required and should be greater than 0.";
-        }
-
-        return validationErrors;
-    }
-
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const validationErrors = validateCourse();
+        const validationErrors = validateCourse(formValues);
         setErrors((currentErrors) => ({
             authorName: currentErrors.authorName,
             ...validationErrors,
@@ -173,7 +145,7 @@ function CreateCourse({ changeMode, setCourses }: CreateCourseProps) {
         setFormValues({ ...initialFormValues });
         setCourseAuthorIds([]);
         setErrors({});
-        setCourses?.((currentCourses) => [...currentCourses, newCourse]);
+        dispatch(addCourse(newCourse));
         changeMode?.();
     }
 

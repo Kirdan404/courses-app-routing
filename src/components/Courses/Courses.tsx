@@ -1,24 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
-import {
-    ADD_NEW_COURSE_BUTTON_TEXT,
-    mockedAuthorsList,
-    mockedCoursesList,
-    ROUTES,
-} from "../../constants";
-import type { Course } from "../../types/course";
+import { ADD_NEW_COURSE_BUTTON_TEXT, ROUTES } from "../../constants";
+import { useAppSelector } from "../../store/hooks";
+import { selectAuthors, selectCourses } from "../../store/selectors";
+import EmptyCourseList from "../EmptyCourseList/EmptyCourseList";
 import CourseCard from "./components/CourseCard/CourseCard";
 import SearchBar from "./components/SearchBar/SearchBar";
 import "./Courses.css";
 
-type CoursesProps = Readonly<{
-    courses?: Course[];
-}>;
-
-function Courses({ courses = mockedCoursesList }: CoursesProps) {
+function Courses() {
     const navigate = useNavigate();
+    const courses = useAppSelector(selectCourses);
+    const authors = useAppSelector(selectAuthors);
     const [searchQuery, setSearchQuery] = useState("");
+    const navigateToCreateCourse = () => navigate(ROUTES.CREATE_COURSE);
+
+    if (courses.length === 0) {
+        return <EmptyCourseList onAddCourse={navigateToCreateCourse} />;
+    }
 
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
     const filteredCourses = courses.filter((course) => {
@@ -38,7 +38,7 @@ function Courses({ courses = mockedCoursesList }: CoursesProps) {
                     <SearchBar onSearch={setSearchQuery} />
                     <Button
                         buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
-                        onClick={() => navigate(ROUTES.CREATE_COURSE)}
+                        onClick={navigateToCreateCourse}
                     />
                 </div>
 
@@ -47,7 +47,7 @@ function Courses({ courses = mockedCoursesList }: CoursesProps) {
                         <CourseCard
                             key={course.id}
                             course={course}
-                            authorsList={mockedAuthorsList}
+                            authorsList={authors}
                             onShowCourse={(courseId) =>
                                 navigate(
                                     ROUTES.COURSE_INFO.replace(

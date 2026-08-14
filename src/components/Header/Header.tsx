@@ -1,21 +1,17 @@
 import Button from "../../common/Button/Button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LOGOUT_BUTTON_TEXT, ROUTES, STORAGE_KEYS } from "../../constants";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectUser } from "../../store/selectors";
+import { logout } from "../../store/user/userSlice";
 import Logo from "./components/Logo/Logo";
 import "./Header.css";
 
-type HeaderProps = Readonly<{
-    showUserActions?: boolean;
-    userName?: string;
-    onLogout?: () => void;
-}>;
-
-function Header({ showUserActions = true, userName, onLogout }: HeaderProps) {
+function Header() {
     const location = useLocation();
     const navigate = useNavigate();
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    const displayedUserName =
-        userName ?? localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(selectUser);
     const isAuthenticationPage =
         location.pathname === ROUTES.LOGIN ||
         location.pathname === ROUTES.REGISTRATION;
@@ -23,7 +19,7 @@ function Header({ showUserActions = true, userName, onLogout }: HeaderProps) {
     function handleLogout() {
         localStorage.removeItem(STORAGE_KEYS.TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER_NAME);
-        onLogout?.();
+        dispatch(logout());
         navigate(ROUTES.LOGIN);
     }
 
@@ -31,11 +27,9 @@ function Header({ showUserActions = true, userName, onLogout }: HeaderProps) {
         <header className="header">
             <Logo />
 
-            {showUserActions && token && !isAuthenticationPage && (
+            {user.isAuth && !isAuthenticationPage && (
                 <div className="header__actions">
-                    <span className="header__user-name">
-                        {displayedUserName}
-                    </span>
+                    <span className="header__user-name">{user.name}</span>
                     <Button
                         buttonText={LOGOUT_BUTTON_TEXT}
                         onClick={handleLogout}

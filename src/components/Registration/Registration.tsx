@@ -3,7 +3,8 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
-import { API_BASE_URL, ROUTES } from "../../constants";
+import { ROUTES } from "../../constants";
+import { registerUser } from "../../services/services";
 import "./Registration.css";
 
 type RegistrationFormValues = {
@@ -15,11 +16,6 @@ type RegistrationFormValues = {
 type RegistrationFormErrors = Partial<
     Record<keyof RegistrationFormValues, string>
 >;
-
-type RegistrationResponse = {
-    successful?: boolean;
-    errors?: string[];
-};
 
 const initialFormValues: RegistrationFormValues = {
     name: "",
@@ -77,20 +73,13 @@ function Registration() {
         setServerError("");
 
         try {
-            const response = await fetch(`${API_BASE_URL}/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: formValues.name.trim(),
-                    email: formValues.email.trim(),
-                    password: formValues.password,
-                }),
-            });
-            const result = (await response.json()) as RegistrationResponse;
+            const { ok, data: result } = await registerUser(
+                formValues.name.trim(),
+                formValues.email.trim(),
+                formValues.password
+            );
 
-            if (response.ok || result.successful) {
+            if (ok || result.successful) {
                 navigate(ROUTES.LOGIN);
                 return;
             }
