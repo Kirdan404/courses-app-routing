@@ -3,7 +3,9 @@ import type { ChangeEvent, FormEvent } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import Textarea from "../../common/Textarea/Textarea";
+import getCurrentDate from "../../helpers/getCurrentDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
+import validateCourse from "../../helpers/validateCourse";
 import { addAuthor } from "../../store/authors/authorsSlice";
 import { addCourse } from "../../store/courses/coursesSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -34,15 +36,6 @@ const initialFormValues: CourseFormValues = {
 
 function generateId() {
     return crypto.randomUUID();
-}
-
-function getCurrentDate() {
-    const currentDate = new Date();
-    const day = String(currentDate.getDate()).padStart(2, "0");
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const year = currentDate.getFullYear();
-
-    return `${day}/${month}/${year}`;
 }
 
 function CreateCourse({ changeMode }: CreateCourseProps) {
@@ -127,33 +120,10 @@ function CreateCourse({ changeMode }: CreateCourseProps) {
         );
     }
 
-    function validateCourse() {
-        const validationErrors: CourseFormErrors = {};
-        const trimmedTitle = formValues.title.trim();
-        const trimmedDescription = formValues.description.trim();
-
-        if (trimmedTitle.length < 2) {
-            validationErrors.title =
-                "Title is required and should be at least 2 characters.";
-        }
-
-        if (trimmedDescription.length < 2) {
-            validationErrors.description =
-                "Description is required and should be at least 2 characters.";
-        }
-
-        if (!formValues.duration || durationInMinutes <= 0) {
-            validationErrors.duration =
-                "Duration is required and should be greater than 0.";
-        }
-
-        return validationErrors;
-    }
-
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const validationErrors = validateCourse();
+        const validationErrors = validateCourse(formValues);
         setErrors((currentErrors) => ({
             authorName: currentErrors.authorName,
             ...validationErrors,

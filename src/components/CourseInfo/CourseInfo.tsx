@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { BACK_BUTTON_TEXT, ROUTES } from "../../constants";
 import formatCreationDate from "../../helpers/formatCreationDate";
+import getCourseAuthors from "../../helpers/getCourseAuthors";
 import getCourseDuration from "../../helpers/getCourseDuration";
 import { useAppSelector } from "../../store/hooks";
 import { selectAuthors, selectCourses } from "../../store/selectors";
@@ -18,13 +19,7 @@ function CourseInfo() {
         return <Navigate to={ROUTES.COURSES} replace />;
     }
 
-    const authorsNames = course.authors.map((authorId) => {
-        const author = authors.find(
-            (currentAuthor) => currentAuthor.id === authorId
-        );
-
-        return author ? author.name : authorId;
-    });
+    const authorsNames = getCourseAuthors(course.authors, authors);
 
     return (
         <main className="course-info">

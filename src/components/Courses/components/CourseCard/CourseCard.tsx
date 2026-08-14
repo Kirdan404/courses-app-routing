@@ -3,6 +3,7 @@ import deleteIcon from "../../../../assets/images/delete.png";
 import editIcon from "../../../../assets/images/edit.png";
 import { SHOW_COURSE_BUTTON_TEXT } from "../../../../constants";
 import formatCreationDate from "../../../../helpers/formatCreationDate";
+import getCourseAuthors from "../../../../helpers/getCourseAuthors";
 import getCourseDuration from "../../../../helpers/getCourseDuration";
 import { deleteCourse } from "../../../../store/courses/coursesSlice";
 import { useAppDispatch } from "../../../../store/hooks";
@@ -17,11 +18,7 @@ type CourseCardProps = Readonly<{
 
 function CourseCard({ course, authorsList, onShowCourse }: CourseCardProps) {
     const dispatch = useAppDispatch();
-    const authorsNames = course.authors.map((authorId) => {
-        const author = authorsList.find((author) => author.id === authorId);
-
-        return author ? author.name : authorId;
-    });
+    const authorsNames = getCourseAuthors(course.authors, authorsList);
 
     return (
         <article className="course-card">
