@@ -6,6 +6,7 @@ type UserState = {
     name: string;
     email: string;
     token: string;
+    role: string;
 };
 
 const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN) ?? "";
@@ -16,6 +17,7 @@ const initialState: UserState = {
     name: storedUserName,
     email: "",
     token: storedToken,
+    role: "",
 };
 
 const userSlice = createSlice({
@@ -28,18 +30,21 @@ const userSlice = createSlice({
                 name: string;
                 email: string;
                 token: string;
+                role?: string;
             }>
         ) {
             state.isAuth = true;
             state.name = action.payload.name;
             state.email = action.payload.email;
             state.token = action.payload.token;
+            state.role = action.payload.role ?? "";
         },
         logout(state) {
             state.isAuth = false;
             state.name = "";
             state.email = "";
             state.token = "";
+            state.role = "";
         },
     },
 });
