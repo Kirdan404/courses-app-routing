@@ -10,7 +10,7 @@ import {
 import Header from "./components/Header/Header";
 import CourseInfo from "./components/CourseInfo/CourseInfo";
 import Courses from "./components/Courses/Courses";
-import CreateCourse from "./components/CreateCourse/CreateCourse";
+import CourseForm from "./components/CourseForm/CourseForm";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
@@ -20,10 +20,10 @@ import { fetchCourses } from "./store/courses/coursesSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { selectUser } from "./store/selectors";
 
-function CreateCoursePage() {
+function CourseFormPage() {
     const navigate = useNavigate();
 
-    return <CreateCourse changeMode={() => navigate(ROUTES.COURSES)} />;
+    return <CourseForm changeMode={() => navigate(ROUTES.COURSES)} />;
 }
 
 type DataRouteProps = Readonly<{
@@ -109,7 +109,7 @@ function App() {
                     path={ROUTES.CREATE_COURSE}
                     element={
                         <DataRoute isLoading={isDataLoading}>
-                            <CreateCoursePage />
+                            <CourseFormPage />
                         </DataRoute>
                     }
                 />

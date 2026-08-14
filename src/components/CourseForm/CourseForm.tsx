@@ -12,9 +12,9 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectAuthors } from "../../store/selectors";
 import type { Course } from "../../types/course";
 import AuthorItem from "../AuthorItem/AuthorItem";
-import "./CreateCourse.css";
+import "./CourseForm.css";
 
-type CreateCourseProps = Readonly<{
+type CourseFormProps = Readonly<{
     changeMode?: () => void;
 }>;
 
@@ -38,7 +38,7 @@ function generateId() {
     return crypto.randomUUID();
 }
 
-function CreateCourse({ changeMode }: CreateCourseProps) {
+function CourseForm({ changeMode }: CourseFormProps) {
     const dispatch = useAppDispatch();
     const authorsList = useAppSelector(selectAuthors);
     const [formValues, setFormValues] =
@@ -264,4 +264,4 @@ function CreateCourse({ changeMode }: CreateCourseProps) {
     );
 }
 
-export default CreateCourse;
+export default CourseForm;
