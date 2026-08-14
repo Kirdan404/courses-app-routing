@@ -1,17 +1,10 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getCourses } from "../../services/services";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { Course } from "../../types/course";
+import { fetchCourses } from "./thunk";
 
 type CoursesState = Course[];
 
 const initialState: CoursesState = [];
-
-export const fetchCourses = createAsyncThunk<Course[]>(
-    "courses/fetchAll",
-    async () => {
-        return getCourses();
-    }
-);
 
 const coursesSlice = createSlice({
     name: "courses",

@@ -1,17 +1,10 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getAuthors } from "../../services/services";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { Author } from "../../types/course";
+import { fetchAuthors } from "./thunk";
 
 type AuthorsState = Author[];
 
 const initialState: AuthorsState = [];
-
-export const fetchAuthors = createAsyncThunk<Author[]>(
-    "authors/fetchAll",
-    async () => {
-        return getAuthors();
-    }
-);
 
 const authorsSlice = createSlice({
     name: "authors",

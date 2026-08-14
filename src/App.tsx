@@ -15,8 +15,8 @@ import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
 import { ROUTES } from "./constants";
-import { fetchAuthors } from "./store/authors/authorsSlice";
-import { fetchCourses } from "./store/courses/coursesSlice";
+import { fetchAuthors } from "./store/authors/thunk";
+import { fetchCourses } from "./store/courses/thunk";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { selectUser } from "./store/selectors";
 
