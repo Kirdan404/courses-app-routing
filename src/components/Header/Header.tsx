@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { LOGOUT_BUTTON_TEXT, ROUTES, STORAGE_KEYS } from "../../constants";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/selectors";
+import { logoutCurrentUser } from "../../store/user/thunk";
 import { logout } from "../../store/user/userSlice";
 import Logo from "./components/Logo/Logo";
 import "./Header.css";
@@ -16,7 +17,8 @@ function Header() {
         location.pathname === ROUTES.LOGIN ||
         location.pathname === ROUTES.REGISTRATION;
 
-    function handleLogout() {
+    async function handleLogout() {
+        await dispatch(logoutCurrentUser(user.token));
         localStorage.removeItem(STORAGE_KEYS.TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER_NAME);
         dispatch(logout());
