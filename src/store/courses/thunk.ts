@@ -3,6 +3,7 @@ import {
     createCourse as createCourseRequest,
     deleteCourse as deleteCourseRequest,
     getCourses,
+    updateCourse as updateCourseRequest,
 } from "../../services/services";
 import type { Course, NewCourse } from "../../types/course";
 
@@ -32,4 +33,14 @@ type CreateCoursePayload = {
 export const createCourse = createAsyncThunk<Course, CreateCoursePayload>(
     "courses/create",
     ({ course, token }) => createCourseRequest(course, token)
+);
+
+type UpdateCoursePayload = CreateCoursePayload & {
+    courseId: string;
+};
+
+export const updateCourse = createAsyncThunk<Course, UpdateCoursePayload>(
+    "courses/update",
+    ({ courseId, course, token }) =>
+        updateCourseRequest(courseId, course, token)
 );

@@ -6,7 +6,7 @@ type ApiResponse<T> = {
 };
 
 export type CurrentUser = {
-    name: string;
+    name: string | null;
     email: string;
     role: string;
 };
@@ -109,6 +109,28 @@ export const createCourse = async (
 
     if (!response.ok || !data.result) {
         throw new Error("Failed to create course");
+    }
+
+    return data.result;
+};
+
+export const updateCourse = async (
+    courseId: string,
+    course: NewCourse,
+    token: string
+): Promise<Course> => {
+    const response = await fetch(`${API_BASE_URL}/courses/${courseId}`, {
+        method: "PUT",
+        headers: {
+            Authorization: token,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(course),
+    });
+    const data = (await response.json()) as ApiResponse<Course>;
+
+    if (!response.ok || !data.result) {
+        throw new Error("Failed to update course");
     }
 
     return data.result;

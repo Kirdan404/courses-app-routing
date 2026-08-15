@@ -1,14 +1,19 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { useParams } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import Textarea from "../../common/Textarea/Textarea";
 import getCourseDuration from "../../helpers/getCourseDuration";
 import validateCourse from "../../helpers/validateCourse";
 import { createAuthor } from "../../store/authors/thunk";
-import { createCourse } from "../../store/courses/thunk";
+import { createCourse, updateCourse } from "../../store/courses/thunk";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { selectAuthors, selectUser } from "../../store/selectors";
+import {
+    selectAuthors,
+    selectCourses,
+    selectUser,
+} from "../../store/selectors";
 import type { NewCourse } from "../../types/course";
 import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CourseForm.css";
@@ -34,13 +39,27 @@ const initialFormValues: CourseFormValues = {
 };
 
 function CourseForm({ changeMode }: CourseFormProps) {
+    const { courseId } = useParams<{ courseId: string }>();
     const dispatch = useAppDispatch();
     const authorsList = useAppSelector(selectAuthors);
+    const courses = useAppSelector(selectCourses);
     const user = useAppSelector(selectUser);
-    const [formValues, setFormValues] =
-        useState<CourseFormValues>(initialFormValues);
+    const courseToUpdate = courses.find((course) => course.id === courseId);
+    const isUpdateMode = Boolean(courseId);
+    const [formValues, setFormValues] = useState<CourseFormValues>(() =>
+        courseToUpdate
+            ? {
+                  title: courseToUpdate.title,
+                  description: courseToUpdate.description,
+                  duration: String(courseToUpdate.duration),
+                  authorName: "",
+              }
+            : initialFormValues
+    );
     const [errors, setErrors] = useState<CourseFormErrors>({});
-    const [courseAuthorIds, setCourseAuthorIds] = useState<string[]>([]);
+    const [courseAuthorIds, setCourseAuthorIds] = useState<string[]>(
+        () => courseToUpdate?.authors ?? []
+    );
 
     const availableAuthors = authorsList.filter(
         (author) => !courseAuthorIds.includes(author.id)
@@ -144,9 +163,19 @@ function CourseForm({ changeMode }: CourseFormProps) {
         };
 
         try {
-            await dispatch(
-                createCourse({ course: newCourse, token: user.token })
-            ).unwrap();
+            if (courseId) {
+                await dispatch(
+                    updateCourse({
+                        courseId,
+                        course: newCourse,
+                        token: user.token,
+                    })
+                ).unwrap();
+            } else {
+                await dispatch(
+                    createCourse({ course: newCourse, token: user.token })
+                ).unwrap();
+            }
             setFormValues({ ...initialFormValues });
             setCourseAuthorIds([]);
             setErrors({});
@@ -154,9 +183,20 @@ function CourseForm({ changeMode }: CourseFormProps) {
         } catch {
             setErrors((currentErrors) => ({
                 ...currentErrors,
-                title: "Unable to create course.",
+                title: isUpdateMode
+                    ? "Unable to update course."
+                    : "Unable to create course.",
             }));
         }
+    }
+
+    if (isUpdateMode && !courseToUpdate) {
+        return (
+            <main className="create-course">
+                <h1 className="create-course__title">Course not found</h1>
+                <Button buttonText="Back" onClick={changeMode} />
+            </main>
+        );
     }
 
     return (
@@ -265,7 +305,9 @@ function CourseForm({ changeMode }: CourseFormProps) {
             <div className="create-course__actions">
                 <Button buttonText="Cancel" onClick={changeMode} />
                 <Button
-                    buttonText="Create course"
+                    buttonText={
+                        isUpdateMode ? "Update course" : "Create course"
+                    }
                     form="create-course-form"
                     type="submit"
                 />

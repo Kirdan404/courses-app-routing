@@ -4,6 +4,7 @@ import {
     createCourse,
     deleteCourse as deleteCourseThunk,
     fetchCourses,
+    updateCourse as updateCourseThunk,
 } from "./thunk";
 
 type CoursesState = Course[];
@@ -38,6 +39,15 @@ const coursesSlice = createSlice({
             )
             .addCase(createCourse.fulfilled, (state, action) => {
                 state.push(action.payload);
+            })
+            .addCase(updateCourseThunk.fulfilled, (state, action) => {
+                const courseIndex = state.findIndex(
+                    (course) => course.id === action.payload.id
+                );
+
+                if (courseIndex !== -1) {
+                    state[courseIndex] = action.payload;
+                }
             });
     },
 });

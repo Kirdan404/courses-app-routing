@@ -38,7 +38,7 @@ const userSlice = createSlice({
             state.name = action.payload.name;
             state.email = action.payload.email;
             state.token = action.payload.token;
-            state.role = action.payload.role ?? "";
+            state.role = action.payload.role?.toUpperCase() ?? "";
         },
         logout(state) {
             state.isAuth = false;
@@ -50,9 +50,9 @@ const userSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
-            state.name = action.payload.name;
+            state.name = action.payload.name ?? "";
             state.email = action.payload.email;
-            state.role = action.payload.role;
+            state.role = action.payload.role.toUpperCase();
         });
     },
 });
