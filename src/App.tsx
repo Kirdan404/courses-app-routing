@@ -14,7 +14,7 @@ import CourseForm from "./components/CourseForm/CourseForm";
 import Login from "./components/Login/Login";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Registration from "./components/Registration/Registration";
-import { ADMIN_ROLE, ROUTES } from "./constants";
+import { ROUTES } from "./constants";
 import { fetchAuthors } from "./store/authors/thunk";
 import { fetchCourses } from "./store/courses/thunk";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
@@ -29,20 +29,21 @@ function CourseFormPage() {
 
 type DataRouteProps = Readonly<{
     children: ReactNode;
+    isAuth: boolean;
     isLoading: boolean;
 }>;
 
-function DataRoute({ children, isLoading }: DataRouteProps) {
-    return (
-        <PrivateRoute>
-            {isLoading ? (
-                <main>
-                    <output>Loading...</output>
-                </main>
-            ) : (
-                children
-            )}
-        </PrivateRoute>
+function DataRoute({ children, isAuth, isLoading }: DataRouteProps) {
+    if (!isAuth) {
+        return <Navigate to={ROUTES.LOGIN} replace />;
+    }
+
+    return isLoading ? (
+        <main>
+            <output>Loading...</output>
+        </main>
+    ) : (
+        children
     );
 }
 
@@ -102,7 +103,10 @@ function App() {
                 <Route
                     path={ROUTES.COURSES}
                     element={
-                        <DataRoute isLoading={isDataLoading}>
+                        <DataRoute
+                            isAuth={user.isAuth}
+                            isLoading={isDataLoading}
+                        >
                             <Courses />
                         </DataRoute>
                     }
@@ -110,19 +114,23 @@ function App() {
                 <Route
                     path={ROUTES.CREATE_COURSE}
                     element={
-                        <DataRoute isLoading={isDataLoading}>
-                            {user.role === ADMIN_ROLE ? (
+                        <DataRoute
+                            isAuth={user.isAuth}
+                            isLoading={isDataLoading}
+                        >
+                            <PrivateRoute>
                                 <CourseFormPage />
-                            ) : (
-                                <Navigate to={ROUTES.COURSES} replace />
-                            )}
+                            </PrivateRoute>
                         </DataRoute>
                     }
                 />
                 <Route
                     path={ROUTES.COURSE_INFO}
                     element={
-                        <DataRoute isLoading={isDataLoading}>
+                        <DataRoute
+                            isAuth={user.isAuth}
+                            isLoading={isDataLoading}
+                        >
                             <CourseInfo />
                         </DataRoute>
                     }
