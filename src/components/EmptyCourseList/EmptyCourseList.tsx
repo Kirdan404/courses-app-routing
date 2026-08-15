@@ -1,29 +1,41 @@
+import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import {
     ADD_NEW_COURSE_BUTTON_TEXT,
+    ADMIN_ROLE,
+    COURSE_CREATION_PERMISSION_MESSAGE,
     EMPTY_COURSE_LIST_SUBTITLE,
     EMPTY_COURSE_LIST_TITLE,
+    ROUTES,
 } from "../../constants";
+import { useAppSelector } from "../../store/hooks";
+import { selectUser } from "../../store/selectors";
 import "./EmptyCourseList.css";
 
-type EmptyCourseListProps = Readonly<{
-    onAddCourse?: () => void;
-}>;
+function EmptyCourseList() {
+    const navigate = useNavigate();
+    const user = useAppSelector(selectUser);
+    const isAdmin = user.role === ADMIN_ROLE;
 
-function EmptyCourseList({ onAddCourse }: EmptyCourseListProps) {
     return (
         <main className="empty-course-list">
             <h2 className="empty-course-list__title">
                 {EMPTY_COURSE_LIST_TITLE}
             </h2>
-            <p className="empty-course-list__subtitle">
-                {EMPTY_COURSE_LIST_SUBTITLE}
-            </p>
-            {onAddCourse && (
-                <Button
-                    buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
-                    onClick={onAddCourse}
-                />
+            {isAdmin ? (
+                <>
+                    <p className="empty-course-list__subtitle">
+                        {EMPTY_COURSE_LIST_SUBTITLE}
+                    </p>
+                    <Button
+                        buttonText={ADD_NEW_COURSE_BUTTON_TEXT}
+                        onClick={() => navigate(ROUTES.CREATE_COURSE)}
+                    />
+                </>
+            ) : (
+                <p className="empty-course-list__subtitle">
+                    {COURSE_CREATION_PERMISSION_MESSAGE}
+                </p>
             )}
         </main>
     );

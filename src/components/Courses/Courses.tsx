@@ -26,15 +26,7 @@ function Courses() {
     const navigateToCreateCourse = () => navigate(ROUTES.CREATE_COURSE);
 
     if (courses.length === 0) {
-        return (
-            <EmptyCourseList
-                onAddCourse={
-                    user.role === ADMIN_ROLE
-                        ? navigateToCreateCourse
-                        : undefined
-                }
-            />
-        );
+        return <EmptyCourseList />;
     }
 
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();

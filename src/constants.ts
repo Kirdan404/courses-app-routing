@@ -22,3 +22,5 @@ export const SEARCH_INPUT_PLACEHOLDER = "Input text";
 export const EMPTY_COURSE_LIST_TITLE = "Course List is Empty";
 export const EMPTY_COURSE_LIST_SUBTITLE =
     'Please use "Add New Course" button to add your first course';
+export const COURSE_CREATION_PERMISSION_MESSAGE =
+    "You don't have permissions to create a course. Please log in as ADMIN";
