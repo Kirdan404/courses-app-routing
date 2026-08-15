@@ -3,14 +3,13 @@ import type { ChangeEvent, FormEvent } from "react";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import Textarea from "../../common/Textarea/Textarea";
-import getCurrentDate from "../../helpers/getCurrentDate";
 import getCourseDuration from "../../helpers/getCourseDuration";
 import validateCourse from "../../helpers/validateCourse";
-import { addAuthor } from "../../store/authors/authorsSlice";
-import { addCourse } from "../../store/courses/coursesSlice";
+import { createAuthor } from "../../store/authors/thunk";
+import { createCourse } from "../../store/courses/thunk";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { selectAuthors } from "../../store/selectors";
-import type { Course } from "../../types/course";
+import { selectAuthors, selectUser } from "../../store/selectors";
+import type { NewCourse } from "../../types/course";
 import AuthorItem from "../AuthorItem/AuthorItem";
 import "./CourseForm.css";
 
@@ -34,13 +33,10 @@ const initialFormValues: CourseFormValues = {
     authorName: "",
 };
 
-function generateId() {
-    return crypto.randomUUID();
-}
-
 function CourseForm({ changeMode }: CourseFormProps) {
     const dispatch = useAppDispatch();
     const authorsList = useAppSelector(selectAuthors);
+    const user = useAppSelector(selectUser);
     const [formValues, setFormValues] =
         useState<CourseFormValues>(initialFormValues);
     const [errors, setErrors] = useState<CourseFormErrors>({});
@@ -82,7 +78,7 @@ function CourseForm({ changeMode }: CourseFormProps) {
         updateField("duration", numericValue);
     }
 
-    function handleCreateAuthor() {
+    async function handleCreateAuthor() {
         const trimmedAuthorName = formValues.authorName.trim();
 
         if (!trimmedAuthorName) {
@@ -101,13 +97,20 @@ function CourseForm({ changeMode }: CourseFormProps) {
             return;
         }
 
-        dispatch(
-            addAuthor({
-                id: generateId(),
-                name: trimmedAuthorName,
-            })
-        );
-        updateField("authorName", "");
+        try {
+            await dispatch(
+                createAuthor({
+                    author: { name: trimmedAuthorName },
+                    token: user.token,
+                })
+            ).unwrap();
+            updateField("authorName", "");
+        } catch {
+            setErrors((currentErrors) => ({
+                ...currentErrors,
+                authorName: "Unable to create author.",
+            }));
+        }
     }
 
     function handleAddAuthor(authorId: string) {
@@ -120,7 +123,7 @@ function CourseForm({ changeMode }: CourseFormProps) {
         );
     }
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
         const validationErrors = validateCourse(formValues);
@@ -133,20 +136,27 @@ function CourseForm({ changeMode }: CourseFormProps) {
             return;
         }
 
-        const newCourse: Course = {
-            id: generateId(),
+        const newCourse: NewCourse = {
             title: formValues.title.trim(),
             description: formValues.description.trim(),
-            creationDate: getCurrentDate(),
             duration: durationInMinutes,
             authors: courseAuthorIds,
         };
 
-        setFormValues({ ...initialFormValues });
-        setCourseAuthorIds([]);
-        setErrors({});
-        dispatch(addCourse(newCourse));
-        changeMode?.();
+        try {
+            await dispatch(
+                createCourse({ course: newCourse, token: user.token })
+            ).unwrap();
+            setFormValues({ ...initialFormValues });
+            setCourseAuthorIds([]);
+            setErrors({});
+            changeMode?.();
+        } catch {
+            setErrors((currentErrors) => ({
+                ...currentErrors,
+                title: "Unable to create course.",
+            }));
+        }
     }
 
     return (

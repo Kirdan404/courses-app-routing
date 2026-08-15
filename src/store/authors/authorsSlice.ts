@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { Author } from "../../types/course";
-import { fetchAuthors } from "./thunk";
+import { createAuthor, fetchAuthors } from "./thunk";
 
 type AuthorsState = Author[];
 
@@ -18,10 +18,11 @@ const authorsSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(
-            fetchAuthors.fulfilled,
-            (_state, action) => action.payload
-        );
+        builder
+            .addCase(fetchAuthors.fulfilled, (_state, action) => action.payload)
+            .addCase(createAuthor.fulfilled, (state, action) => {
+                state.push(action.payload);
+            });
     },
 });
 

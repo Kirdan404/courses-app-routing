@@ -11,3 +11,10 @@ export type Author = {
     id: string;
     name: string;
 };
+
+export type NewCourse = Pick<
+    Course,
+    "title" | "description" | "duration" | "authors"
+>;
+
+export type NewAuthor = Pick<Author, "name">;

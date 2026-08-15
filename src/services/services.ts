@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../constants";
-import type { Author, Course } from "../types/course";
+import type { Author, Course, NewAuthor, NewCourse } from "../types/course";
 
 type ApiResponse<T> = {
     result?: T;
@@ -91,6 +91,48 @@ export const deleteCourse = async (
     if (!response.ok) {
         throw new Error("Failed to delete course");
     }
+};
+
+export const createCourse = async (
+    course: NewCourse,
+    token: string
+): Promise<Course> => {
+    const response = await fetch(`${API_BASE_URL}/courses/add`, {
+        method: "POST",
+        headers: {
+            Authorization: token,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(course),
+    });
+    const data = (await response.json()) as ApiResponse<Course>;
+
+    if (!response.ok || !data.result) {
+        throw new Error("Failed to create course");
+    }
+
+    return data.result;
+};
+
+export const createAuthor = async (
+    author: NewAuthor,
+    token: string
+): Promise<Author> => {
+    const response = await fetch(`${API_BASE_URL}/authors/add`, {
+        method: "POST",
+        headers: {
+            Authorization: token,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(author),
+    });
+    const data = (await response.json()) as ApiResponse<Author>;
+
+    if (!response.ok || !data.result) {
+        throw new Error("Failed to create author");
+    }
+
+    return data.result;
 };
 
 export const loginUser = async (
