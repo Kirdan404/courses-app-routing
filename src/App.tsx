@@ -125,6 +125,19 @@ function App() {
                     }
                 />
                 <Route
+                    path={ROUTES.UPDATE_COURSE}
+                    element={
+                        <DataRoute
+                            isAuth={user.isAuth}
+                            isLoading={isDataLoading}
+                        >
+                            <PrivateRoute>
+                                <CourseFormPage />
+                            </PrivateRoute>
+                        </DataRoute>
+                    }
+                />
+                <Route
                     path={ROUTES.COURSE_INFO}
                     element={
                         <DataRoute

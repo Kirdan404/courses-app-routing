@@ -1,12 +1,18 @@
+import { useNavigate } from "react-router-dom";
 import Button from "../../../../common/Button/Button";
 import deleteIcon from "../../../../assets/images/delete.png";
 import editIcon from "../../../../assets/images/edit.png";
-import { SHOW_COURSE_BUTTON_TEXT } from "../../../../constants";
+import {
+    ADMIN_ROLE,
+    ROUTES,
+    SHOW_COURSE_BUTTON_TEXT,
+} from "../../../../constants";
 import formatCreationDate from "../../../../helpers/formatCreationDate";
 import getCourseAuthors from "../../../../helpers/getCourseAuthors";
 import getCourseDuration from "../../../../helpers/getCourseDuration";
-import { deleteCourse } from "../../../../store/courses/coursesSlice";
-import { useAppDispatch } from "../../../../store/hooks";
+import { deleteCourse } from "../../../../store/courses/thunk";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { selectUser } from "../../../../store/selectors";
 import type { Author, Course } from "../../../../types/course";
 import "./CourseCard.css";
 
@@ -18,7 +24,10 @@ type CourseCardProps = Readonly<{
 
 function CourseCard({ course, authorsList, onShowCourse }: CourseCardProps) {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const user = useAppSelector(selectUser);
     const authorsNames = getCourseAuthors(course.authors, authorsList);
+    const isAdmin = user.role === ADMIN_ROLE;
 
     return (
         <article className="course-card">
@@ -48,29 +57,48 @@ function CourseCard({ course, authorsList, onShowCourse }: CourseCardProps) {
                         buttonText={SHOW_COURSE_BUTTON_TEXT}
                         onClick={() => onShowCourse?.(course.id)}
                     />
-                    <Button
-                        ariaLabel="Delete course"
-                        buttonText={
-                            <img
-                                alt=""
-                                className="course-card__action-icon"
-                                src={deleteIcon}
+                    {isAdmin && (
+                        <>
+                            <Button
+                                ariaLabel="Delete course"
+                                buttonText={
+                                    <img
+                                        alt=""
+                                        className="course-card__action-icon"
+                                        src={deleteIcon}
+                                    />
+                                }
+                                className="course-card__icon-button"
+                                onClick={() =>
+                                    dispatch(
+                                        deleteCourse({
+                                            courseId: course.id,
+                                            token: user.token,
+                                        })
+                                    )
+                                }
                             />
-                        }
-                        className="course-card__icon-button"
-                        onClick={() => dispatch(deleteCourse(course.id))}
-                    />
-                    <Button
-                        ariaLabel="Update course"
-                        buttonText={
-                            <img
-                                alt=""
-                                className="course-card__action-icon"
-                                src={editIcon}
+                            <Button
+                                ariaLabel="Update course"
+                                buttonText={
+                                    <img
+                                        alt=""
+                                        className="course-card__action-icon"
+                                        src={editIcon}
+                                    />
+                                }
+                                className="course-card__icon-button"
+                                onClick={() =>
+                                    navigate(
+                                        ROUTES.UPDATE_COURSE.replace(
+                                            ":courseId",
+                                            course.id
+                                        )
+                                    )
+                                }
                             />
-                        }
-                        className="course-card__icon-button"
-                    />
+                        </>
+                    )}
                 </div>
             </div>
         </article>

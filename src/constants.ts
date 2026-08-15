@@ -11,6 +11,7 @@ export const ROUTES = {
     REGISTRATION: "/registration",
     COURSES: "/courses",
     CREATE_COURSE: "/courses/add",
+    UPDATE_COURSE: "/courses/update/:courseId",
     COURSE_INFO: "/courses/:courseId",
     NOT_FOUND: "*",
 } as const;

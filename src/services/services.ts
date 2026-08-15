@@ -77,6 +77,22 @@ export const logoutUser = async (token: string): Promise<void> => {
     }
 };
 
+export const deleteCourse = async (
+    courseId: string,
+    token: string
+): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/courses/${courseId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: token,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to delete course");
+    }
+};
+
 export const loginUser = async (
     email: string,
     password: string

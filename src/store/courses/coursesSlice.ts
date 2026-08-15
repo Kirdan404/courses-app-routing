@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { Course } from "../../types/course";
-import { fetchCourses } from "./thunk";
+import { deleteCourse as deleteCourseThunk, fetchCourses } from "./thunk";
 
 type CoursesState = Course[];
 
@@ -27,10 +27,11 @@ const coursesSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(
-            fetchCourses.fulfilled,
-            (_state, action) => action.payload
-        );
+        builder
+            .addCase(fetchCourses.fulfilled, (_state, action) => action.payload)
+            .addCase(deleteCourseThunk.fulfilled, (state, action) =>
+                state.filter((course) => course.id !== action.payload)
+            );
     },
 });
 
